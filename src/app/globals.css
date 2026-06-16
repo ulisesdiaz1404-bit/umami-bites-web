@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   UMAMI BITES CATERING · SISTEMA VISUAL
+   Dirección estética: minimalista orgánico premium.
+   Inspirado en el isologo UB con detalle botánico, líneas finas,
+   fotografía de alimentos en primer plano sobre fondo marrón oscuro.
+   Paleta cálida: madera oscura, beige dorado, champagne.
+   Todo vive en CSS variables vía @theme (Tailwind v4).
+   ===================================================================== */
+
+@theme {
+  /* --- Lienzo claro (crema cálida) --- */
+  --color-bg: #f7f0e4; /* ivory cálido: fondo base */
+  --color-bg-deep: #efe5d4; /* arena: secciones alternadas / inputs */
+  --color-surface: #fdf9f2; /* blanco cálido: cards y superficies */
+  --color-surface-2: #f2e8d7; /* hover / superficie elevada */
+  --color-canvas: #f7f0e4; /* alias del fondo base */
+
+  /* --- Tinta / texto (marrón cálido sobre claro) --- */
+  --color-primary: #4a361f; /* texto principal: marrón cálido */
+  --color-accent: #b07a3c; /* dorado profundo: CTAs, badges, precios */
+  --color-accent-deep: #936230; /* hover de acento */
+  --color-on-accent: #fbf6ee; /* texto claro sobre botones dorados */
+  --color-muted: #8a7256; /* texto secundario */
+  --color-cream: #2c1a0e; /* máximo contraste = espresso (titulares) */
+
+  /* --- Líneas --- */
+  --color-line: rgba(74, 54, 31, 0.14);
+  --color-line-strong: rgba(74, 54, 31, 0.26);
+
+  /* --- Estados --- */
+  --color-success: #5f8a4f;
+  --color-danger: #c0563f;
+
+  /* --- Tipografías (inyectadas por next/font vía variables) --- */
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-body: var(--font-dm-sans), system-ui, sans-serif;
+
+  /* --- Radios --- */
+  --radius-base: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+
+  /* --- Sombras (sobre fondo claro, cálidas) --- */
+  --shadow-soft: 0 22px 55px -28px rgba(74, 54, 31, 0.42);
+  --shadow-card: 0 14px 36px -22px rgba(74, 54, 31, 0.30);
+  --shadow-glow: 0 0 0 1px rgba(176, 122, 60, 0.28), 0 18px 46px -26px rgba(176, 122, 60, 0.45);
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  color: var(--color-cream);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg-deep);
+}
+
+/* Scrollbar de marca */
+::-webkit-scrollbar { width: 11px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-2);
+  border-radius: 10px;
+  border: 2px solid var(--color-bg-deep);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+
+/* Acento itálico serif (palabras destacadas en titulares) */
+.accent-serif {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--color-accent);
+}
+
+/* Eyebrow / kicker de sección */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--color-accent);
+}
+.eyebrow.is-centered::after {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+/* Grano sutil para fondos con profundidad */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Glass — botones y tarjetas translúcidas sobre el hero */
+.glass {
+  background: rgba(250, 243, 235, 0.08);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(250, 243, 235, 0.18);
+}
+
+/* Texto con degradado dorado para titulares destacados */
+.text-gold-gradient {
+  background: linear-gradient(100deg, var(--color-primary) 0%, var(--color-accent) 45%, var(--color-cream) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Skeleton pulse para loading states (paleta oscura) */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.skeleton {
+  background: linear-gradient(100deg, var(--color-surface) 30%, var(--color-surface-2) 50%, var(--color-surface) 70%);
+  background-size: 200% 100%;
+  animation: pulse-soft 1.6s ease-in-out infinite;
+  border-radius: var(--radius-base);
+}
+
+/* Brillo que recorre (shimmer) para acentos del hero */
+@keyframes shimmer {
+  0% { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+
+/* Flotación suave para elementos decorativos del hero */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+.float-slow { animation: float-slow 7s ease-in-out infinite; }
+
+@keyframes float-slower {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-22px) rotate(-3deg); }
+}
+.float-slower { animation: float-slower 10s ease-in-out infinite; }
+
+/* Rotación lenta del anillo botánico (eco del isologo) */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-slow { animation: spin-slow 60s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

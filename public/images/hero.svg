@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1200" viewBox="0 0 2000 1200" role="img" aria-label="Mesa de catering Umami Bites">
+  <defs>
+    <radialGradient id="hg" cx="62%" cy="40%" r="85%">
+      <stop offset="0%" stop-color="#5a3a20"/>
+      <stop offset="55%" stop-color="#3d2512"/>
+      <stop offset="100%" stop-color="#1f1209"/>
+    </radialGradient>
+    <filter id="hn"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="2000" height="1200" fill="url(#hg)"/>
+  <rect width="2000" height="1200" fill="#000" opacity="0.05" filter="url(#hn)"/>
+  <g fill="none" stroke="#c49a6c" stroke-opacity="0.18" stroke-width="2">
+    <circle cx="1380" cy="520" r="360"/>
+    <circle cx="1380" cy="520" r="300"/>
+  </g>
+  <g opacity="0.5">
+    <circle cx="640" cy="760" r="120" fill="#c49a6c" opacity="0.10"/>
+    <circle cx="1180" cy="900" r="90" fill="#d4b896" opacity="0.08"/>
+  </g>
+</svg>

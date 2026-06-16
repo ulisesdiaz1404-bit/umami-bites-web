@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Asado al asador">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#2c1a0e"/>
+      <stop offset="100%" stop-color="#1f1209"/>
+    </radialGradient>
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1200" height="900" fill="url(#g)"/>
+  <rect width="1200" height="900" fill="#000" opacity="0.04" filter="url(#n)"/>
+  <g fill="none" stroke="#c49a6c" stroke-opacity="0.30" stroke-width="2">
+    <circle cx="600" cy="380" r="210"/>
+  </g>
+  <g transform="translate(600,300)" fill="none" stroke="#c49a6c" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round">
+    <path d="M-150,-70 q60,-50 120,-10 q-70,10 -120,10 z" />
+    <path d="M-150,-70 q40,-70 110,-55 q-60,30 -110,55 z" />
+    <path d="M-150,-70 l-30,40" />
+  </g>
+  <text x="600" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="150" font-weight="600" fill="#c49a6c" fill-opacity="0.92" letter-spacing="6">UB</text>
+  <text x="600" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="34" font-style="italic" fill="#faf3eb" fill-opacity="0.75">Umami Bites</text>
+  <text x="600" y="690" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="46" font-weight="500" fill="#faf3eb" fill-opacity="0.96">Asado al asador</text>
+  <text x="600" y="740" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" letter-spacing="6" fill="#c49a6c" fill-opacity="0.85">CATERING</text>
+</svg>
