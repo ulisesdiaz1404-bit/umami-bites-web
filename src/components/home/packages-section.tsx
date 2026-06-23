@@ -3,10 +3,10 @@ import { ArrowRight } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { PackageCard } from "@/components/menu/package-card";
 import { Button } from "@/components/ui/button";
-import { getFeaturedPackages } from "@/lib/data/mock-menu";
+import { getFeaturedPackages } from "@/lib/data/menu";
 
-export function PackagesSection() {
-  const packages = getFeaturedPackages(4);
+export async function PackagesSection() {
+  const packages = await getFeaturedPackages(4);
 
   return (
     <section className="relative overflow-hidden border-y border-line bg-bg-deep">

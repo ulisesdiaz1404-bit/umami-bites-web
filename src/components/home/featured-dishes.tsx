@@ -3,10 +3,10 @@ import { ArrowRight } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { Button } from "@/components/ui/button";
-import { getFeaturedDishes } from "@/lib/data/mock-menu";
+import { getFeaturedDishes } from "@/lib/data/menu";
 
-export function FeaturedDishes() {
-  const dishes = getFeaturedDishes(4);
+export async function FeaturedDishes() {
+  const dishes = await getFeaturedDishes(4);
 
   return (
     <section className="relative mx-auto max-w-7xl px-5 py-24 lg:px-8">

@@ -9,11 +9,15 @@ import { ItemPurchase } from "@/components/menu/item-purchase";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { PackageCard } from "@/components/menu/package-card";
 import { Reveal } from "@/components/ui/reveal";
-import { getAllItems, getItemBySlug, getRelatedItems } from "@/lib/data/mock-menu";
+import { getAllItems, getItemBySlug, getRelatedItems } from "@/lib/data/menu";
 import { formatPrice } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return getAllItems().map((item) => ({ slug: item.slug }));
+// ISR + slugs nuevos a demanda (ítems agregados desde el admin).
+export const revalidate = 60;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return (await getAllItems()).map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({
@@ -22,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const item = getItemBySlug(slug);
+  const item = await getItemBySlug(slug);
   if (!item) return { title: "No encontrado" };
   return {
     title: item.name,
@@ -37,10 +41,10 @@ export default async function ItemDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const item = getItemBySlug(slug);
+  const item = await getItemBySlug(slug);
   if (!item) notFound();
 
-  const related = getRelatedItems(item);
+  const related = await getRelatedItems(item);
   const unit = item.metadata?.unit;
   const incluye = item.metadata?.incluye;
 

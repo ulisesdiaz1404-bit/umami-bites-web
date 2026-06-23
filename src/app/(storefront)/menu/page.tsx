@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { MenuGrid } from "@/components/menu/menu-grid";
 import { Reveal } from "@/components/ui/reveal";
-import { getAllItems, CATEGORIES } from "@/lib/data/mock-menu";
+import { getAllItems, CATEGORIES } from "@/lib/data/menu";
 import type { ItemType } from "@/lib/types/menu-item";
+
+// ISR: refleja ediciones del admin sin redeploy.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Menú",
@@ -22,7 +25,7 @@ export default async function MenuPage({
   searchParams: Promise<{ tipo?: string }>;
 }) {
   const { tipo } = await searchParams;
-  const items = getAllItems();
+  const items = await getAllItems();
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-28 pt-32 lg:px-8">

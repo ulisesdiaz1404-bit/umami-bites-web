@@ -2,3 +2,8 @@ allowBuilds:
   ffmpeg-static: set this to true or false
   sharp: set this to true or false
   unrs-resolver: set this to true or false
+
+# Fuerza postcss parcheado (GHSA-qx2v-qp2m-jg93: XSS en </style>).
+# next@16 trae postcss@8.4.31 de forma transitiva; lo subimos a >=8.5.10.
+overrides:
+  postcss@<8.5.10: ">=8.5.10"

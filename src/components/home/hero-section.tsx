@@ -108,6 +108,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.55, duration: 0.8, ease }}
             className="accent-serif block"
+            style={{ color: "#b5c46b" }}
           >
             en tu puerta
           </motion.span>
