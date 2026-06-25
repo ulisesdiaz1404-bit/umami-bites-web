@@ -18,12 +18,32 @@ export const CURRENCY = "ARS" as const;
 export const CATEGORIES = [
   "Picadas",
   "Empanadas",
-  "Finger food",
+  "Complementos",
   "Menús",
   "Brunch",
   "Mesa dulce",
   "Bebidas",
 ] as const;
+
+// =====================================================================
+// SERVICIOS — agrupación de alto nivel de la carta. Todo se ofrece como
+// un servicio de catering, repartido en dos grandes grupos:
+//   1) "Picadas y complementos": tablas, empanadas, finger food, mesa
+//      dulce y bebidas que sumás a tu evento.
+//   2) "Menús": menús completos para ~20+ personas (servicio integral:
+//      recepción, comida, bebida, vajilla y servicio de mesa) + brunch.
+// El grupo se DERIVA de la categoría (no se guarda en DB), así el filtro
+// "Picadas y complementos / Menús" sale solo del campo `category`.
+// =====================================================================
+export const SERVICE_GROUPS = ["Picadas y complementos", "Menús"] as const;
+export type ServiceGroup = (typeof SERVICE_GROUPS)[number];
+
+const MENU_CATEGORIES = new Set(["Menús", "Brunch"]);
+
+/** Devuelve a qué servicio pertenece una categoría. */
+export function serviceGroupOf(category: string): ServiceGroup {
+  return MENU_CATEGORIES.has(category) ? "Menús" : "Picadas y complementos";
+}
 
 export const MENU_ITEMS: MenuItem[] = [
   // ----------------------------- PICADAS -----------------------------
@@ -32,7 +52,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "picada-encuentro",
     name: "Picada Encuentro",
     description:
-      "Dos platos de cerámica con fiambres (jamón cocido natural, jamón crudo, salamín picado fino) y quesos (pategrás, queso con pimienta negra, queso azul). Acompañamiento de hummus de garbanzo y limón, hummus de morrón y tostaditas con finas hierbas. Decoración con aceitunas, frutas de estación y frutos secos.",
+      "Jamón cocido y crudo, salamín fino, bondiola y mortadela con pistacho. 3 quesos (pategrás, ají molido y azul). Hummus de garbanzo y de morrón, tostaditas, aceitunas, frutas de estación y frutos secos.",
     priceInCents: 8_900_000,
     currency: "ARS",
     images: [img("picada-encuentro", "Picada Encuentro de Umami Bites")],
@@ -42,15 +62,15 @@ export const MENU_ITEMS: MenuItem[] = [
     type: "package",
     servings: 6,
     includes: [
-      "Fiambres: jamón cocido, jamón crudo, salamín picado fino",
-      "Quesos: pategrás, pimienta negra, azul",
+      "Fiambres: jamón cocido, jamón crudo, salamín fino, bondiola, mortadela con pistacho",
+      "Quesos: pategrás, ají molido, azul",
       "Hummus de garbanzo y limón + hummus de morrón",
       "Tostaditas saborizadas con finas hierbas",
       "Aceitunas, frutas de estación y frutos secos",
     ],
     metadata: {
       tagline: "Comen 6 · pican 10",
-      tierMayor: "$98.000 — comen 8 / pican 12",
+      tierMayor: "$120.000 — comen 8 / pican 12",
       unit: "tabla",
     },
   },
@@ -59,8 +79,8 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "picada-umami",
     name: "Picada Umami",
     description:
-      "La especialidad de la casa. Fiambres premium: jamón cocido natural, jamón crudo, salamín picado fino, salamín picado grueso ahumado, longaniza y bondiola. Quesos: pategrás, pimienta negra, queso con ají y pimentón, brie y rockefort. Acompañamiento de dip de mayonesa de berenjena, queso crema con ciboulette, hummus de morrón, tostaditas saborizadas y batatitas fritas.",
-    priceInCents: 16_000_000,
+      "La especialidad de la casa. 6 fiambres premium (jamón crudo, bondiola, longaniza, salamines), 5 quesos (brie, rockefort, pategrás, ají y pimentón, pimienta negra), dips caseros, tostaditas, batatitas, frutas y frutos secos.",
+    priceInCents: 18_000_000,
     currency: "ARS",
     images: [img("picada-umami", "Picada Umami — la especialidad de la casa")],
     available: true,
@@ -77,7 +97,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       tagline: "Comen 10 · pican 20",
-      tierMayor: "$225.000 — comen 15 / pican 30",
+      tierMayor: "$270.000 — comen 15 / pican 30",
       especialidad: "true",
       unit: "tabla",
     },
@@ -87,9 +107,9 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: "emp-saltenas",
     slug: "empanadas-saltenas",
-    name: "Empanadas salteñas (docena)",
+    name: "Empanadas (docena)",
     description:
-      "Empanadas de carne cortada a cuchillo tipo salteñas. Congeladas o horneadas a elección. Mínimo 1 docena.",
+      "Carne cortada a cuchillo (salteñas), caprese, verdura y humita. Congeladas o horneadas a elección. Mínimo 1 docena.",
     priceInCents: 2_600_000,
     currency: "ARS",
     images: [img("empanadas-saltenas", "Empanadas salteñas cortadas a cuchillo")],
@@ -102,9 +122,9 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: "emp-canastitas",
     slug: "canastitas-surtidas",
-    name: "Canastitas surtidas (1/2 docena)",
+    name: "Canastitas (1/2 docena)",
     description:
-      "Canastitas de verdura y de jamón y queso, congeladas o horneadas a elección. Mínimo 6 unidades por variedad.",
+      "De verdura y de jamón y queso. Congeladas o horneadas a elección. Mínimo 6 unidades por variedad.",
     priceInCents: 1_300_000,
     currency: "ARS",
     images: [img("canastitas-surtidas", "Canastitas de verdura y de jamón y queso")],
@@ -115,19 +135,20 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: { unit: "1/2 docena", estado: "Congeladas o horneadas a elección" },
   },
 
-  // --------------------------- FINGER FOOD ---------------------------
+  // --------------------------- COMPLEMENTOS --------------------------
+  // Especialmente presentados en vajilla de madera o cerámica.
   {
     id: "ff-shots-guacamole",
     slug: "shots-guacamole-nachos",
     name: "Shots de guacamole y nachos (x12)",
     description:
-      "Doce shots individuales de guacamole con nachos, más nachos extra en canastita.",
+      "Guacamole fresco en shots individuales con nachos crocantes, más nachos extra en canastita.",
     priceInCents: 1_600_000,
     currency: "ARS",
     images: [img("shots-guacamole-nachos", "Shots de guacamole con nachos")],
     available: true,
     maxQuantity: 20,
-    category: "Finger food",
+    category: "Complementos",
     type: "dish",
     metadata: { unit: "docena" },
   },
@@ -136,13 +157,13 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "brusquetas-surtidas",
     name: "Brusquetas a elección (x24)",
     description:
-      "Veinticuatro brusquetas (12 de cada variedad). Opciones: jamón crudo y rúcula; mix de verduras; pera, queso azul, nuez y miel; cebolla caramelizada.",
+      "A elección: jamón crudo y rúcula; mix de verduras; pera, queso azul, nuez y miel; cebolla caramelizada. 12 de cada variedad.",
     priceInCents: 1_800_000,
     currency: "ARS",
     images: [img("brusquetas-surtidas", "Brusquetas surtidas de Umami Bites")],
     available: true,
     maxQuantity: 20,
-    category: "Finger food",
+    category: "Complementos",
     type: "dish",
     metadata: { unit: "pack" },
   },
@@ -157,7 +178,7 @@ export const MENU_ITEMS: MenuItem[] = [
     images: [img("tarteletas-queso-azul-nuez", "Tarteletas de queso azul y nuez")],
     available: true,
     maxQuantity: 20,
-    category: "Finger food",
+    category: "Complementos",
     type: "dish",
     metadata: { unit: "pack" },
   },
@@ -169,11 +190,53 @@ export const MENU_ITEMS: MenuItem[] = [
     priceInCents: 1_600_000,
     currency: "ARS",
     images: [img("salchichas-copetin-vino", "Salchichas de copetín al vino tinto")],
-    available: false,
+    available: true,
     maxQuantity: 20,
-    category: "Finger food",
+    category: "Complementos",
     type: "dish",
     metadata: { unit: "pack" },
+  },
+  {
+    id: "ff-pinchos-cherry",
+    slug: "pinchos-tomate-cherry",
+    name: "Pinchos de tomate cherry (x12)",
+    description: "Tomate cherry, queso y albahaca fresca en pinchos individuales.",
+    priceInCents: 900_000,
+    currency: "ARS",
+    images: [img("pinchos-tomate-cherry", "Pinchos de tomate cherry, queso y albahaca")],
+    available: true,
+    maxQuantity: 20,
+    category: "Complementos",
+    type: "dish",
+    metadata: { unit: "docena" },
+  },
+  {
+    id: "ff-camembert-castanas",
+    slug: "camembert-castanas-miel",
+    name: "Camembert con castañas y miel",
+    description: "Queso camembert acompañado de castañas de cajú y un hilo de miel.",
+    priceInCents: 2_200_000,
+    currency: "ARS",
+    images: [img("camembert-castanas-miel", "Queso camembert con castañas de cajú y miel")],
+    available: true,
+    maxQuantity: 20,
+    category: "Complementos",
+    type: "dish",
+    metadata: { unit: "porción" },
+  },
+  {
+    id: "ff-flor-papas",
+    slug: "flor-de-papas",
+    name: "Flor de papas",
+    description: "Papas Pringles en flor sobre pasta de queso blanco saborizado.",
+    priceInCents: 1_000_000,
+    currency: "ARS",
+    images: [img("flor-de-papas", "Flor de papas sobre pasta de queso blanco")],
+    available: true,
+    maxQuantity: 20,
+    category: "Complementos",
+    type: "dish",
+    metadata: { unit: "porción" },
   },
 
   // ------------------------------ MENÚS ------------------------------
@@ -182,15 +245,15 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-carnes-desmechadas",
     name: 'Menú "Carnes desmechadas"',
     description:
-      "Recepción con mesa de campo (tabla de fiambres y quesos, empanadas criollas, dips, brusquetas y mini tarteletas). La comida: sandwichitos de carne vacuna y barbacoa y/o bondiola desmechada al vino tinto, con salsas caseras (queso crema y verdeo, mayonesa de berenjena, mayonesa de ajo, hummus de garbanzo y de morrón, pasta de aceitunas).",
-    priceInCents: 3_000_000,
+      "Sandwichitos de carne vacuna y barbacoa y/o bondiola desmechada al vino tinto, con salsas caseras (queso crema y verdeo, mayonesa de berenjena, mayonesa de ajo, hummus de garbanzo y de morrón, pasta de aceitunas). Con recepción de mesa de campo: tabla de fiambres y quesos, empanadas criollas, dips, brusquetas y mini tarteletas.",
+    priceInCents: 34_000_000,
     currency: "ARS",
     images: [img("menu-carnes-desmechadas", "Menú Carnes desmechadas")],
     available: true,
-    maxQuantity: 300,
+    maxQuantity: 20,
     category: "Menús",
     type: "package",
-    servings: 1,
+    servings: 20,
     includes: [
       "Recepción: mesa de campo completa",
       "Empanadas criollas y dips caseros",
@@ -198,7 +261,8 @@ export const MENU_ITEMS: MenuItem[] = [
       "6 salsas a elección",
     ],
     metadata: {
-      unit: "persona",
+      unit: "menú",
+      tagline: "Menú para ~20 personas",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -538,17 +602,20 @@ export const MENU_ITEMS: MenuItem[] = [
 // está elegida para ser ÚNICA por ítem. Las demás son galería del detalle
 // (ahí sí pueden repetirse, no se ven en el listado).
 const REAL_PHOTOS: Record<string, string[]> = {
-  // Picadas
-  "picada-umami": ["p42.jpg", "p15.jpg", "p29.jpg", "p23.jpg"],
-  "picada-encuentro": ["p18.jpg", "p27.jpg", "p23.jpg"],
-  // Empanadas (única foto real del rubro: contiene empanadas + canastitas)
-  "empanadas-saltenas": ["p19.jpg"],
-  "canastitas-surtidas": ["p19.jpg"],
-  // Finger food
-  "shots-guacamole-nachos": ["p26.jpg"],
+  // Picadas (fotos nuevas 2026)
+  "picada-umami": ["picada-umami-1.jpg", "picada-umami-2.jpg", "picada-umami-3.jpg", "picada-umami-4.jpg"],
+  "picada-encuentro": ["picada-encuentro-1.jpg", "picada-encuentro-2.jpg", "picada-encuentro-3.jpg"],
+  // Empanadas (foto nueva: empanadas + canastitas en tabla)
+  "empanadas-saltenas": ["empanadas-1.jpg"],
+  "canastitas-surtidas": ["empanadas-1.jpg"],
+  // Complementos (fotos nuevas 2026)
+  "shots-guacamole-nachos": ["shots-guacamole.jpg"],
   "brusquetas-surtidas": ["p22.jpg"],
   "tarteletas-queso-azul-nuez": ["p03.jpg"],
   "salchichas-copetin-vino": ["p28.jpg"],
+  "pinchos-tomate-cherry": ["pinchos-cherry.jpg"],
+  "camembert-castanas-miel": ["camembert-castanas.jpg"],
+  "flor-de-papas": ["flor-de-papas.jpg"],
   // Menús (cada uno con una tabla/mesa distinta)
   "menu-carnes-desmechadas": ["p16.jpg", "p12.jpg"],
   "menu-todo-sandwich": ["p12.jpg", "p16.jpg"],

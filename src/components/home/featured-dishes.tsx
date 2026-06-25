@@ -15,12 +15,12 @@ export async function FeaturedDishes() {
           <div>
             <span className="eyebrow">Para picar y compartir</span>
             <h2 className="mt-5 max-w-xl font-display text-3xl text-cream sm:text-4xl lg:text-5xl">
-              Platos <span className="accent-serif">destacados</span>
+              Picadas y <span className="accent-serif">complementos</span>
             </h2>
           </div>
           <Button asChild variant="link" className="px-0">
-            <Link href="/menu?tipo=dish">
-              Ver todos los platos <ArrowRight className="size-4" />
+            <Link href="/menu?servicio=complementos">
+              Ver todo <ArrowRight className="size-4" />
             </Link>
           </Button>
         </div>

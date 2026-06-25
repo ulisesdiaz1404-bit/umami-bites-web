@@ -53,7 +53,7 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
 
         <div className="mt-4 flex items-end justify-between gap-3 pt-2">
           <div>
-            <span className="font-display text-xl text-accent">
+            <span className="price text-xl">
               {formatPrice(item.priceInCents, item.currency)}
             </span>
             {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}

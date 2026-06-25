@@ -29,8 +29,9 @@ export function Footer() {
             <h4 className="text-xs font-medium uppercase tracking-[0.24em] text-accent">Navegación</h4>
             <ul className="space-y-2.5 text-sm text-primary/85">
               <li><Link href="/" className="transition-colors hover:text-cream">Inicio</Link></li>
-              <li><Link href="/menu" className="transition-colors hover:text-cream">Menú completo</Link></li>
-              <li><Link href="/menu?tipo=package" className="transition-colors hover:text-cream">Paquetes y menús</Link></li>
+              <li><Link href="/menu" className="transition-colors hover:text-cream">Servicios</Link></li>
+              <li><Link href="/menu?servicio=menus" className="transition-colors hover:text-cream">Menús completos</Link></li>
+              <li><Link href="/#quienes-somos" className="transition-colors hover:text-cream">Quiénes somos</Link></li>
               <li><Link href="/cart" className="transition-colors hover:text-cream">Mi carrito</Link></li>
             </ul>
           </div>

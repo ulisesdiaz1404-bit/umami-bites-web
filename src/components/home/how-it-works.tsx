@@ -5,7 +5,7 @@ const STEPS = [
   {
     icon: UtensilsCrossed,
     title: "Elegís",
-    text: "Armás tu pedido con picadas, menús, finger food o mesa dulce desde nuestro menú online.",
+    text: "Armás tu pedido con picadas, complementos, menús o mesa dulce desde nuestro menú online.",
   },
   {
     icon: CalendarCheck,

@@ -132,11 +132,11 @@ export function HeroSection() {
         >
           <Button asChild size="lg">
             <Link href="/menu">
-              Ver menú <ArrowRight className="size-4" />
+              Ver servicios <ArrowRight className="size-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="glass">
-            <Link href="/menu?tipo=package">Nuestros paquetes</Link>
+            <Link href="/menu?servicio=menus">Nuestros menús</Link>
           </Button>
         </motion.div>
 

@@ -6,32 +6,36 @@ import { ChevronDown } from "lucide-react";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { PackageCard } from "@/components/menu/package-card";
 import { cn } from "@/lib/utils";
-import type { ItemType, MenuItem } from "@/lib/types/menu-item";
+import { serviceGroupOf } from "@/lib/data/mock-menu";
+import type { ServiceGroup } from "@/lib/data/mock-menu";
+import type { MenuItem } from "@/lib/types/menu-item";
 
-type TypeFilter = "all" | ItemType;
+export type GroupFilter = "all" | ServiceGroup;
 
-const TYPE_TABS: { value: TypeFilter; label: string }[] = [
+const GROUP_TABS: { value: GroupFilter; label: string }[] = [
   { value: "all", label: "Todos" },
-  { value: "dish", label: "Platos" },
-  { value: "package", label: "Paquetes" },
+  { value: "Picadas y complementos", label: "Picadas y complementos" },
+  { value: "Menús", label: "Menús" },
 ];
 
 interface MenuGridProps {
   items: MenuItem[];
   categories: readonly string[];
-  initialType?: TypeFilter;
+  initialGroup?: GroupFilter;
 }
 
-export function MenuGrid({ items, categories, initialType = "all" }: MenuGridProps) {
-  const [type, setType] = useState<TypeFilter>(initialType);
+export function MenuGrid({ items, categories, initialGroup = "all" }: MenuGridProps) {
+  const [group, setGroup] = useState<GroupFilter>(initialGroup);
   const [category, setCategory] = useState<string>("all");
 
   const filtered = useMemo(
     () =>
       items.filter(
-        (i) => (type === "all" || i.type === type) && (category === "all" || i.category === category)
+        (i) =>
+          (group === "all" || serviceGroupOf(i.category) === group) &&
+          (category === "all" || i.category === category)
       ),
-    [items, type, category]
+    [items, group, category]
   );
 
   return (
@@ -40,23 +44,23 @@ export function MenuGrid({ items, categories, initialType = "all" }: MenuGridPro
         {/* Toggle por tipo */}
         <div
           role="tablist"
-          aria-label="Filtrar por tipo"
-          className="inline-flex rounded-full border border-line bg-surface p-1"
+          aria-label="Filtrar por servicio"
+          className="inline-flex flex-wrap rounded-full border border-line bg-surface p-1"
         >
-          {TYPE_TABS.map((tab) => (
+          {GROUP_TABS.map((tab) => (
             <button
               key={tab.value}
               role="tab"
-              aria-selected={type === tab.value}
-              onClick={() => setType(tab.value)}
+              aria-selected={group === tab.value}
+              onClick={() => setGroup(tab.value)}
               className={cn(
                 "relative rounded-full px-5 py-2 text-sm font-medium transition-colors",
-                type === tab.value ? "text-on-accent" : "text-primary/80 hover:text-cream"
+                group === tab.value ? "text-on-accent" : "text-primary/80 hover:text-cream"
               )}
             >
-              {type === tab.value && (
+              {group === tab.value && (
                 <motion.span
-                  layoutId="type-pill"
+                  layoutId="group-pill"
                   className="absolute inset-0 rounded-full bg-accent"
                   transition={{ type: "spring", stiffness: 360, damping: 30 }}
                 />

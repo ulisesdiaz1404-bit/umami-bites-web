@@ -83,7 +83,7 @@ export default async function ItemDetailPage({
           )}
 
           <div className="mt-5 flex items-end gap-2">
-            <span className="font-display text-4xl text-accent">
+            <span className="price text-4xl">
               {formatPrice(item.priceInCents, item.currency)}
             </span>
             {unit && <span className="pb-1 text-sm text-muted">/ {unit}</span>}

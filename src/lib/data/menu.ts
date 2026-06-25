@@ -1,5 +1,5 @@
 import type { MenuItem, MenuImage } from "@/lib/types/menu-item";
-import { MENU_ITEMS, CATEGORIES } from "@/lib/data/mock-menu";
+import { MENU_ITEMS, CATEGORIES, SERVICE_GROUPS, serviceGroupOf } from "@/lib/data/mock-menu";
 import { createPublicClient } from "@/lib/supabase/public";
 
 // =====================================================================
@@ -9,7 +9,8 @@ import { createPublicClient } from "@/lib/supabase/public";
 // Los componentes consumen el type MenuItem, no saben de dónde viene.
 // =====================================================================
 
-export { CATEGORIES };
+export { CATEGORIES, SERVICE_GROUPS, serviceGroupOf };
+export type { ServiceGroup } from "@/lib/data/mock-menu";
 
 interface MenuRow {
   id: string;

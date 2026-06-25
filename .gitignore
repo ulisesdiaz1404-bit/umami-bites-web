@@ -32,3 +32,6 @@ next-env.d.ts
 .verceldeploy.txt
 
 .vercel
+
+# Carpeta de trabajo con fotos fuente (no deployar)
+/nuevas fotos umami bites/

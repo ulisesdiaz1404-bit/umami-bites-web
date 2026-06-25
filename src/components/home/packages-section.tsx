@@ -16,11 +16,11 @@ export async function PackagesSection() {
           <div className="mx-auto max-w-2xl text-center">
             <span className="eyebrow is-centered justify-center">Eventos sin estrés</span>
             <h2 className="mt-5 font-display text-4xl text-cream sm:text-5xl lg:text-6xl">
-              Paquetes y <span className="accent-serif">menús completos</span>
+              Nuestros <span className="accent-serif">menús completos</span>
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-primary/85">
-              Cada menú incluye recepción, comida principal, bebida sin alcohol, vajilla, mantelería
-              y servicio de mesa. Superando las 100 personas, 5% de descuento.
+              Menús pensados para tu evento (~20 personas): incluyen recepción, comida principal,
+              bebida sin alcohol, vajilla, mantelería y servicio de mesa.
             </p>
           </div>
         </Reveal>
@@ -36,8 +36,8 @@ export async function PackagesSection() {
         <Reveal delay={0.1}>
           <div className="mt-14 text-center">
             <Button asChild size="lg" variant="outline">
-              <Link href="/menu?tipo=package">
-                Ver todos los paquetes <ArrowRight className="size-4" />
+              <Link href="/menu?servicio=menus">
+                Ver todos los menús <ArrowRight className="size-4" />
               </Link>
             </Button>
           </div>

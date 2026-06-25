@@ -106,7 +106,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
 
         <div className="mt-5 flex items-end justify-between gap-3 border-t border-line pt-4">
           <div>
-            <span className="font-display text-2xl text-accent">
+            <span className="price text-2xl">
               {formatPrice(item.priceInCents, item.currency)}
             </span>
             {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}

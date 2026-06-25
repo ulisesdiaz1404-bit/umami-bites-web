@@ -98,6 +98,17 @@ h1, h2, h3, h4 {
   color: var(--color-accent);
 }
 
+/* Precio — sans tabular, peso fuerte: se lee rápido y se distingue de los
+   titulares serif. Dorado de marca. Usar en cards y detalle. */
+.price {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--color-accent);
+  line-height: 1;
+}
+
 /* Eyebrow / kicker de sección */
 .eyebrow {
   font-family: var(--font-body);
