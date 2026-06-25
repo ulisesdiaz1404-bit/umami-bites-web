@@ -622,7 +622,7 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "tarteletas-queso-azul-nuez": ["p03.jpg"],
   "salchichas-copetin-vino": ["p28.jpg"],
   "pinchos-tomate-cherry": ["pinchos-cherry.jpg"],
-  "camembert-castanas-miel": ["camembert-castanas.jpg"],
+  "camembert-castanas-miel": ["camembert-1.jpg"],
   "flor-de-papas": ["flor-de-papas.jpg"],
   // Menús — fotos reales del plato (no tablas genéricas)
   "menu-carnes-desmechadas": ["carnes-desmechadas-1.jpg", "carnes-desmechadas-2.jpg"],
@@ -630,7 +630,7 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "menu-asado-al-asador": ["asado-1.jpg", "asado-2.jpg"],
   "menu-pizza-party": ["pizza-party-1.jpg"],
   "menu-comida-criolla": ["comida-criolla-1.jpg"],
-  "menu-encuentro": ["p21.jpg", "p04.jpg"],
+  "menu-encuentro": ["empanadas-1.jpg", "picada-encuentro-1.jpg"],
   "mesa-de-campo-umami": ["p04.jpg", "p12.jpg"],
   "isla-saludable": ["isla-saludable-1.jpg", "isla-saludable-2.jpg"],
   // Brunch + mesa dulce + tortas
@@ -643,7 +643,7 @@ const REAL_PHOTOS: Record<string, string[]> = {
   // Bebidas (fotos recortadas de la carta real)
   "cervezas-artesanales-x6": ["bev-cervezas.jpg"],
   "vino-malbec-desfachatados": ["bev-vino.jpg"],
-  "barra-libre-tragos": ["bev-tragos.jpg"],
+  "barra-libre-tragos": ["barra-tragos.jpg"],
 };
 
 for (const item of MENU_ITEMS) {
