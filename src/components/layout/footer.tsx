@@ -13,7 +13,7 @@ export function Footer() {
       <div className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div className="space-y-5">
-            <Logo mark={52} />
+            <Logo mark={64} />
             <p className="max-w-sm text-sm leading-relaxed text-muted">
               Sabor profundo y presentación impecable. Llevamos nuestro servicio de catering a
               domicilio, salones, quintas y oficinas. Una buena picada inicia un gran encuentro.

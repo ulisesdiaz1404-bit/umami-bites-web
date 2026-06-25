@@ -46,7 +46,7 @@ export function Header() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 lg:px-8">
         <Link href="/" aria-label="Umami Bites — Inicio">
-          <Logo mark={scrolled ? 40 : 46} />
+          <Logo mark={scrolled ? 46 : 54} priority />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
