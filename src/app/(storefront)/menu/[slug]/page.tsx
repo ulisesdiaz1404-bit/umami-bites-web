@@ -75,12 +75,21 @@ export default async function ItemDetailPage({
             {item.name}
           </h1>
 
-          {item.servings && (
-            <p className="mt-3 inline-flex items-center gap-2 text-sm text-primary/85">
-              <Users className="size-4 text-accent" />
-              {item.metadata?.tagline ?? `Pensado para ${item.servings} personas`}
-            </p>
-          )}
+          {(() => {
+            const label =
+              item.metadata?.tagline ??
+              (item.metadata?.unit === "persona"
+                ? "Precio por persona"
+                : item.servings && item.servings > 1
+                  ? `Pensado para ${item.servings} personas`
+                  : null);
+            return label ? (
+              <p className="mt-3 inline-flex items-center gap-2 text-sm text-primary/85">
+                <Users className="size-4 text-accent" />
+                {label}
+              </p>
+            ) : null;
+          })()}
 
           <div className="mt-5 flex items-end gap-2">
             <span className="price text-4xl">

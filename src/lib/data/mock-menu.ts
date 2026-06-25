@@ -288,6 +288,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       servicio: "Servicio en domicilio",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
@@ -298,7 +299,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Menú "Asado al asador"',
     description:
       "Mesa de campo premium de recepción (fiambres, quesos, empanadas criollas y sándwich de chorizo bombón). La comida: 2 ensaladas a elección (clásica o gourmet), achuras (morcilla y mollejas al limón) y asado de vacío y costillar al asador según espacio disponible. Postre a elección.",
-    priceInCents: 6_200_000,
+    priceInCents: 5_500_000,
     currency: "ARS",
     images: [img("menu-asado-al-asador", "Menú Asado al asador")],
     available: true,
@@ -315,6 +316,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -340,6 +342,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -365,6 +368,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -374,7 +378,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Menú "Encuentro"',
     description:
       "Recepción con mesa de campo (fiambres, quesos, dips de hummus y berenjenas en escabeche, panes, tostaditas saborizadas, grisines, batatitas fritas y crackers). La comida: 2 por persona — empanadas salteñas de carne, canastitas de verdura y canastitas caprese.",
-    priceInCents: 1_800_000,
+    priceInCents: 2_300_000,
     currency: "ARS",
     images: [img("menu-encuentro", "Menú Encuentro")],
     available: true,
@@ -389,6 +393,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -398,7 +403,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Mesa de campo "Umami"',
     description:
       "Tabla de fiambres y quesos, dips de distintos sabores (hummus de garbanzo y morrón asado, baba ganush, crema ciboulette, queso crema con verdeo, pasta de aceituna), brusquetas variadas, mini tarteletas de rockefort y nuez y albondiguitas de poroto rojo y garbanzo.",
-    priceInCents: 2_200_000,
+    priceInCents: 2_600_000,
     currency: "ARS",
     images: [img("mesa-de-campo-umami", "Mesa de campo Umami")],
     available: true,
@@ -412,7 +417,7 @@ export const MENU_ITEMS: MenuItem[] = [
       "Brusquetas variadas + mini tarteletas de rockefort y nuez",
       "Albondiguitas de poroto rojo y garbanzo",
     ],
-    metadata: { unit: "persona" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20" },
   },
   {
     id: "menu-isla-saludable",
@@ -420,7 +425,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: "Isla saludable",
     description:
       "Muffins integrales (cacao, remolacha, zuccini, chocolate blanco), bandeja de frutas de estación, barras de cereal, tostadas de pan integral con semillas, dulce casero, queso untable, tabla de quesos, mix de frutos secos, licuados, jugo de naranja exprimido y yogurt casero con granola.",
-    priceInCents: 400_000,
+    priceInCents: 600_000,
     currency: "ARS",
     images: [img("isla-saludable", "Isla saludable de Umami Bites")],
     available: true,
@@ -434,7 +439,7 @@ export const MENU_ITEMS: MenuItem[] = [
       "Yogurt casero con granola y licuados",
       "Tabla de quesos y dulce casero",
     ],
-    metadata: { unit: "persona", tipo: "Complemento saludable" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", tipo: "Complemento saludable" },
   },
 
   // ------------------------------ BRUNCH -----------------------------
@@ -444,7 +449,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: "Brunch",
     description:
       "Salados: chips de pan blanco y negro con fiambres, sanwichitos de miga, scons salados, pizzetas o medialunas calientes y tabla de fiambres. Dulce: alfajorcitos, brownies, apple crumble, lemonies, torta a elección (1 cada 10 personas), muffins variados y fruta de estación.",
-    priceInCents: 2_000_000,
+    priceInCents: 2_400_000,
     currency: "ARS",
     images: [img("menu-brunch", "Brunch salado y dulce de Umami Bites")],
     available: true,
@@ -460,6 +465,7 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       unit: "persona",
+      tagline: "Por persona · mínimo 20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -618,17 +624,17 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "pinchos-tomate-cherry": ["pinchos-cherry.jpg"],
   "camembert-castanas-miel": ["camembert-castanas.jpg"],
   "flor-de-papas": ["flor-de-papas.jpg"],
-  // Menús (cada uno con una tabla/mesa distinta)
-  "menu-carnes-desmechadas": ["p16.jpg", "p12.jpg"],
-  "menu-todo-sandwich": ["p12.jpg", "p16.jpg"],
-  "menu-asado-al-asador": ["p15.jpg", "p11.jpg"],
-  "menu-pizza-party": ["p11.jpg", "p03.jpg"],
-  "menu-comida-criolla": ["p25.jpg"],
+  // Menús — fotos reales del plato (no tablas genéricas)
+  "menu-carnes-desmechadas": ["carnes-desmechadas-1.jpg", "carnes-desmechadas-2.jpg"],
+  "menu-todo-sandwich": ["todo-sandwich-1.jpg", "todo-sandwich-2.jpg"],
+  "menu-asado-al-asador": ["asado-1.jpg", "asado-2.jpg"],
+  "menu-pizza-party": ["pizza-party-1.jpg"],
+  "menu-comida-criolla": ["comida-criolla-1.jpg"],
   "menu-encuentro": ["p21.jpg", "p04.jpg"],
   "mesa-de-campo-umami": ["p04.jpg", "p12.jpg"],
-  "isla-saludable": ["p24.jpg"],
+  "isla-saludable": ["isla-saludable-1.jpg", "isla-saludable-2.jpg"],
   // Brunch + mesa dulce + tortas
-  "menu-brunch": ["p31.jpg", "p20.jpg"],
+  "menu-brunch": ["brunch-1.jpg", "brunch-2.jpg"],
   "mesa-dulce": ["mesa-dulce-spread.jpg", "p20.jpg", "p30.jpg", "p33.jpg", "p32.jpg"],
   "torta-brownie-ddl": ["p20.jpg"],
   "torta-frutos-rojos": ["p33.jpg", "p24.jpg"],

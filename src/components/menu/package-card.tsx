@@ -16,6 +16,15 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
   const isSpecialty = item.metadata?.especialidad === "true";
   const unit = item.metadata?.unit;
   const tagline = item.metadata?.tagline;
+  // Etiqueta de personas: usa tagline si existe; si es precio por persona,
+  // muestra "Precio por persona" en vez del erróneo "Para 1 personas".
+  const servingsLabel =
+    tagline ??
+    (unit === "persona"
+      ? "Precio por persona"
+      : item.servings && item.servings > 1
+        ? `Para ${item.servings} personas`
+        : null);
 
   return (
     <motion.article
