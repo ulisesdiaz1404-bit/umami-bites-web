@@ -70,8 +70,9 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       tagline: "Comen 6 · pican 10",
-      tierMayor: "$120.000 — comen 8 / pican 12",
       unit: "tabla",
+      variants:
+        '[{"label":"Comen 6 · pican 10","priceInCents":8900000},{"label":"Comen 8 · pican 12","priceInCents":12000000}]',
     },
   },
   {
@@ -97,9 +98,10 @@ export const MENU_ITEMS: MenuItem[] = [
     ],
     metadata: {
       tagline: "Comen 10 · pican 20",
-      tierMayor: "$270.000 — comen 15 / pican 30",
       especialidad: "true",
       unit: "tabla",
+      variants:
+        '[{"label":"Comen 10 · pican 20","priceInCents":18000000},{"label":"Comen 15 · pican 30","priceInCents":27000000}]',
     },
   },
 
@@ -272,7 +274,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-todo-sandwich",
     name: 'Menú "Todo sándwich a la parrilla"',
     description:
-      "Servicio en domicilio. Recepción con mesa de campo y sándwich de chorizo a la parrilla. La comida: sandwichitos en pan de figaza de manteca de lomo y carré de cerdo, acompañados de 3 salsas (agridulce de ciruela y mostaza, criolla, mayonesa de ajo y cebolla de verdeo) y otros aderezos.",
+      "Sandwichitos de lomo y carré de cerdo en pan de figaza con 3 salsas. Recepción de mesa de campo + sándwich de chorizo a la parrilla. Servicio en domicilio.",
     priceInCents: 3_800_000,
     currency: "ARS",
     images: [img("menu-todo-sandwich", "Menú Todo sándwich a la parrilla")],
@@ -300,7 +302,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-asado-al-asador",
     name: 'Menú "Asado al asador"',
     description:
-      "Mesa de campo premium de recepción (fiambres, quesos, empanadas criollas y sándwich de chorizo bombón). La comida: 2 ensaladas a elección (clásica o gourmet), achuras (morcilla y mollejas al limón) y asado de vacío y costillar al asador según espacio disponible. Postre a elección.",
+      "Recepción de mesa de campo premium, 2 ensaladas a elección, achuras (morcilla y mollejas al limón) y asado de vacío y costillar al asador. Postre a elección.",
     priceInCents: 5_500_000,
     currency: "ARS",
     images: [img("menu-asado-al-asador", "Menú Asado al asador")],
@@ -328,7 +330,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-pizza-party",
     name: 'Menú "Pizza party"',
     description:
-      "Recepción con mesa de campo, empanadas de carne criollas, dips, brusquetas, mini tarteletas y albondiguitas. La comida: pizzas de diferentes tipos — muzarella, napolitana, primavera, jamón y morrones, fugazzeta y ananá. Postre a elección.",
+      "Recepción de mesa de campo con empanadas y dips. Pizzas variadas: muzarella, napolitana, primavera, jamón y morrones, fugazzeta y ananá. Postre a elección.",
     priceInCents: 2_900_000,
     currency: "ARS",
     images: [img("menu-pizza-party", "Menú Pizza party")],
@@ -355,7 +357,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-comida-criolla",
     name: 'Menú "Comida criolla"',
     description:
-      "Entrada: tabla de fiambres con 3 quesos, salames, jamón natural y crudo, pan de campo y empanadas salteñas cortadas a cuchillo. Principal a elección: guiso casero de lentejas pardinas con chorizo ahumado, panceta y verduras, o carbonada criolla con carne, papas, batatas, zapallo, choclo y orejones de durazno. Servido en cazuelas de barro norteñas.",
+      "Tabla de fiambres, pan de campo y empanadas salteñas de entrada. Principal a elección: guiso de lentejas pardinas o carbonada criolla, servido en cazuelas de barro.",
     priceInCents: 3_200_000,
     currency: "ARS",
     images: [img("menu-comida-criolla", "Menú Comida criolla — guiso en cazuela de barro")],
@@ -382,7 +384,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-encuentro",
     name: 'Menú "Encuentro"',
     description:
-      "Recepción con mesa de campo (fiambres, quesos, dips de hummus y berenjenas en escabeche, panes, tostaditas saborizadas, grisines, batatitas fritas y crackers). La comida: 2 por persona — empanadas salteñas de carne, canastitas de verdura y canastitas caprese.",
+      "Recepción de mesa de campo (fiambres, quesos, dips, panes y tostaditas). 2 por persona: empanadas salteñas, canastitas de verdura y canastitas caprese.",
     priceInCents: 2_300_000,
     currency: "ARS",
     images: [img("menu-encuentro", "Menú Encuentro")],
@@ -408,7 +410,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "mesa-de-campo-umami",
     name: 'Mesa de campo "Umami"',
     description:
-      "Tabla de fiambres y quesos, dips de distintos sabores (hummus de garbanzo y morrón asado, baba ganush, crema ciboulette, queso crema con verdeo, pasta de aceituna), brusquetas variadas, mini tarteletas de rockefort y nuez y albondiguitas de poroto rojo y garbanzo.",
+      "Tabla de fiambres y quesos, dips variados, brusquetas, mini tarteletas de rockefort y nuez y albondiguitas de poroto y garbanzo.",
     priceInCents: 2_600_000,
     currency: "ARS",
     images: [img("mesa-de-campo-umami", "Mesa de campo Umami")],
@@ -430,7 +432,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "isla-saludable",
     name: "Isla saludable",
     description:
-      "Muffins integrales (cacao, remolacha, zuccini, chocolate blanco), bandeja de frutas de estación, barras de cereal, tostadas de pan integral con semillas, dulce casero, queso untable, tabla de quesos, mix de frutos secos, licuados, jugo de naranja exprimido y yogurt casero con granola.",
+      "Muffins integrales, frutas de estación, frutos secos, yogur con granola, licuados y jugo de naranja exprimido. Opción saludable.",
     priceInCents: 600_000,
     currency: "ARS",
     images: [img("isla-saludable", "Isla saludable de Umami Bites")],
@@ -454,7 +456,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-brunch",
     name: "Brunch",
     description:
-      "Salados: chips de pan blanco y negro con fiambres, sanwichitos de miga, scons salados, pizzetas o medialunas calientes y tabla de fiambres. Dulce: alfajorcitos, brownies, apple crumble, lemonies, torta a elección (1 cada 10 personas), muffins variados y fruta de estación.",
+      "Salados: chips con fiambres, sanwichitos de miga, scons, pizzetas o medialunas y tabla de fiambres. Dulces: alfajorcitos, brownies, muffins, torta y fruta de estación.",
     priceInCents: 2_400_000,
     currency: "ARS",
     images: [img("menu-brunch", "Brunch salado y dulce de Umami Bites")],
@@ -483,7 +485,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "mesa-dulce",
     name: "Mesa dulce",
     description:
-      "Tortas a elección (brownie con DDL y merengue, masa nuez sublé y frutos rojos, rogel, lemon pie, carrot cake, havanett, chocotorta, key lime pie), petit fours, budines y muffins variados.",
+      "Tortas a elección (rogel, lemon pie, carrot cake, chocotorta, brownie con DDL y más), petit fours, budines y muffins variados.",
     priceInCents: 700_000,
     currency: "ARS",
     images: [img("mesa-dulce", "Mesa dulce de Umami Bites")],
@@ -562,24 +564,28 @@ export const MENU_ITEMS: MenuItem[] = [
   {
     id: "beb-cerveza",
     slug: "cervezas-artesanales-x6",
-    name: "Cervezas artesanales (six pack)",
+    name: "Cervezas artesanales",
     description:
-      "6 latas a elección de 470 ml. Línea Antares (Playa Grande, Honey Beer, Scotch roja, Kölsch rubia) y línea Kunstmann (Torobayo).",
-    priceInCents: 2_900_000,
+      "Latas de 470 ml a elección. Línea Antares: Playa Grande, Honey Beer, Scotch roja y Kölsch rubia. Línea Kunstmann: Torobayo.",
+    priceInCents: 2_000_000,
     currency: "ARS",
     images: [img("cervezas-artesanales-x6", "Cervezas artesanales Antares y Kunstmann")],
     available: true,
     maxQuantity: 40,
     category: "Bebidas",
     type: "dish",
-    metadata: { unit: "pack", tierMayor: "$58.000 — 12 latas" },
+    metadata: {
+      unit: "pack",
+      variants:
+        '[{"label":"6 latas (470 ml)","priceInCents":2000000},{"label":"12 latas","priceInCents":4000000}]',
+    },
   },
   {
     id: "beb-vino",
     slug: "vino-malbec-desfachatados",
     name: 'Vino Malbec "Desfachatados"',
     description:
-      "Vino mendocino Bodega Pretexto. Malbec de intenso color violeta, notas a frutos rojos oscuros y buena estructura de taninos.",
+      "Bodega Pretexto (San Rafael, Mendoza). Malbec de color violeta intenso, notas a frutos rojos y buena estructura. La bodega también ofrece Sauvignon Blanc y espumante, ideales para carnes, quesos, pastas y pescados.",
     priceInCents: 2_400_000,
     currency: "ARS",
     images: [img("vino-malbec-desfachatados", "Vino Malbec Desfachatados Bodega Pretexto")],
@@ -587,7 +593,11 @@ export const MENU_ITEMS: MenuItem[] = [
     maxQuantity: 24,
     category: "Bebidas",
     type: "dish",
-    metadata: { unit: "botella", tierMayor: "$180.000 — la caja (x6)" },
+    metadata: {
+      unit: "botella",
+      variants:
+        '[{"label":"Botella","priceInCents":2400000},{"label":"Caja (x6)","priceInCents":14000000}]',
+    },
   },
   {
     id: "beb-barra-libre",

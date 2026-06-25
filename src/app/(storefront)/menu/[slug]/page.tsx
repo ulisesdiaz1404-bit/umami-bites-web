@@ -3,14 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ItemGallery } from "@/components/menu/item-gallery";
-import { ItemPurchase } from "@/components/menu/item-purchase";
+import { PurchasePanel } from "@/components/menu/purchase-panel";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { PackageCard } from "@/components/menu/package-card";
 import { Reveal } from "@/components/ui/reveal";
 import { getAllItems, getItemBySlug, getRelatedItems } from "@/lib/data/menu";
-import { formatPrice } from "@/lib/utils";
 
 // ISR + slugs nuevos a demanda (ítems agregados desde el admin).
 export const revalidate = 60;
@@ -45,7 +43,6 @@ export default async function ItemDetailPage({
   if (!item) notFound();
 
   const related = await getRelatedItems(item);
-  const unit = item.metadata?.unit;
   const incluye = item.metadata?.incluye;
 
   return (
@@ -75,44 +72,28 @@ export default async function ItemDetailPage({
             {item.name}
           </h1>
 
-          {(() => {
-            const label =
-              item.metadata?.tagline ??
-              (item.metadata?.unit === "persona"
-                ? "Precio por persona"
-                : item.servings && item.servings > 1
-                  ? `Pensado para ${item.servings} personas`
-                  : null);
-            return label ? (
-              <p className="mt-3 inline-flex items-center gap-2 text-sm text-primary/85">
-                <Users className="size-4 text-accent" />
-                {label}
-              </p>
-            ) : null;
-          })()}
+          {!item.metadata?.variants &&
+            (() => {
+              const label =
+                item.metadata?.tagline ??
+                (item.metadata?.unit === "persona"
+                  ? "Precio por persona"
+                  : item.servings && item.servings > 1
+                    ? `Pensado para ${item.servings} personas`
+                    : null);
+              return label ? (
+                <p className="mt-3 inline-flex items-center gap-2 text-sm text-primary/85">
+                  <Users className="size-4 text-accent" />
+                  {label}
+                </p>
+              ) : null;
+            })()}
 
-          <div className="mt-5 flex items-end gap-2">
-            <span className="price text-4xl">
-              {formatPrice(item.priceInCents, item.currency)}
-            </span>
-            {unit && <span className="pb-1 text-sm text-muted">/ {unit}</span>}
+          <div className="mt-5">
+            <PurchasePanel item={item} />
           </div>
-          {(() => {
-            const minQty = Number(item.metadata?.minQty) || 0;
-            return minQty > 0 ? (
-              <p className="mt-1.5 text-sm text-muted">
-                Mínimo {minQty} personas · total desde{" "}
-                <span className="font-semibold text-primary">
-                  {formatPrice(item.priceInCents * minQty, item.currency)}
-                </span>
-              </p>
-            ) : null;
-          })()}
-          {item.metadata?.tierMayor && (
-            <p className="mt-1 text-sm text-muted">Opción mayor: {item.metadata.tierMayor}</p>
-          )}
 
-          <p className="mt-6 leading-relaxed text-primary/85">{item.description}</p>
+          <p className="mt-7 leading-relaxed text-primary/85">{item.description}</p>
 
           {item.includes && item.includes.length > 0 && (
             <div className="mt-7">
@@ -135,9 +116,6 @@ export default async function ItemDetailPage({
               Cada menú incluye: {incluye}.
             </p>
           )}
-
-          <Separator className="my-7" />
-          <ItemPurchase item={item} />
         </Reveal>
       </div>
 
