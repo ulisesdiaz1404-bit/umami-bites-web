@@ -44,6 +44,9 @@ export default function CheckoutPage() {
     shippingInCents,
     totalInCents,
     clear,
+    meetsMinimum,
+    amountToMinimumInCents,
+    minOrderInCents,
   } = useCart();
 
   const [name, setName] = useState("");
@@ -84,6 +87,15 @@ export default function CheckoutPage() {
     }
     if (!payment) {
       setError("Elegí un método de pago.");
+      return;
+    }
+    if (!meetsMinimum) {
+      setError(
+        `El pedido mínimo es ${formatPrice(minOrderInCents, "ARS")}. Te faltan ${formatPrice(
+          amountToMinimumInCents,
+          "ARS"
+        )}.`
+      );
       return;
     }
     setError(null);

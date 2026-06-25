@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCartStore, SHIPPING_IN_CENTS } from "@/lib/stores/cart-store";
+import { useCartStore, SHIPPING_IN_CENTS, MIN_ORDER_IN_CENTS } from "@/lib/stores/cart-store";
 
 /**
  * Hook de conveniencia sobre el store del carrito.
@@ -19,6 +19,10 @@ export function useCart() {
   const shippingInCents = store.items.length > 0 ? SHIPPING_IN_CENTS : 0;
   const totalInCents = subtotalInCents + shippingInCents;
 
+  // Mínimo de compra: se evalúa sobre el subtotal de productos.
+  const meetsMinimum = subtotalInCents >= MIN_ORDER_IN_CENTS;
+  const amountToMinimumInCents = Math.max(0, MIN_ORDER_IN_CENTS - subtotalInCents);
+
   return {
     ...store,
     hydrated,
@@ -27,5 +31,8 @@ export function useCart() {
     shippingInCents,
     totalInCents,
     isEmpty: store.items.length === 0,
+    minOrderInCents: MIN_ORDER_IN_CENTS,
+    meetsMinimum,
+    amountToMinimumInCents,
   };
 }

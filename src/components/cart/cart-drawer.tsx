@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { CartItem } from "@/components/cart/cart-item";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { useCart } from "@/hooks/use-cart";
+import { formatPrice } from "@/lib/utils";
 
 /** Fecha mínima de entrega: mañana (ISO yyyy-mm-dd). */
 function minDeliveryDate(): string {
@@ -20,7 +21,17 @@ function minDeliveryDate(): string {
 
 export function CartDrawer() {
   const router = useRouter();
-  const { items, isOpen, closeCart, isEmpty, deliveryDate, setDeliveryDate } = useCart();
+  const {
+    items,
+    isOpen,
+    closeCart,
+    isEmpty,
+    deliveryDate,
+    setDeliveryDate,
+    meetsMinimum,
+    amountToMinimumInCents,
+    minOrderInCents,
+  } = useCart();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -38,7 +49,7 @@ export function CartDrawer() {
     };
   }, [isOpen, closeCart]);
 
-  const canCheckout = !isEmpty && Boolean(deliveryDate);
+  const canCheckout = !isEmpty && Boolean(deliveryDate) && meetsMinimum;
 
   const handleConfirm = () => {
     if (!canCheckout) return;
@@ -122,6 +133,16 @@ export function CartDrawer() {
                   </div>
 
                   <CartSummary />
+
+                  {!meetsMinimum && (
+                    <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
+                      Pedido mínimo {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
+                      <span className="font-semibold text-cream">
+                        {formatPrice(amountToMinimumInCents, "ARS")}
+                      </span>
+                      .
+                    </p>
+                  )}
 
                   <Button onClick={handleConfirm} disabled={!canCheckout} size="lg" className="w-full">
                     Confirmar pedido

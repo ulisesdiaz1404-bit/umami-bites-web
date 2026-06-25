@@ -12,6 +12,9 @@ import type { CartItem } from "@/lib/types/cart";
 /** Envío fijo placeholder en centavos (ARS). Fase 2: cálculo por zona/distancia. */
 export const SHIPPING_IN_CENTS = 50_000; // $500 ARS
 
+/** Mínimo de compra (subtotal de productos) en centavos (ARS). */
+export const MIN_ORDER_IN_CENTS = 8_000_000; // $80.000 ARS
+
 interface CartState {
   items: CartItem[];
   isOpen: boolean;

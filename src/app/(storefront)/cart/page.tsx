@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/hooks/use-cart";
+import { formatPrice } from "@/lib/utils";
 
 function minDeliveryDate(): string {
   const d = new Date();
@@ -18,7 +19,17 @@ function minDeliveryDate(): string {
 
 export default function CartPage() {
   const router = useRouter();
-  const { items, isEmpty, hydrated, deliveryDate, setDeliveryDate, clear } = useCart();
+  const {
+    items,
+    isEmpty,
+    hydrated,
+    deliveryDate,
+    setDeliveryDate,
+    clear,
+    meetsMinimum,
+    amountToMinimumInCents,
+    minOrderInCents,
+  } = useCart();
 
   if (!hydrated) {
     return (
@@ -43,7 +54,7 @@ export default function CartPage() {
     );
   }
 
-  const canCheckout = Boolean(deliveryDate);
+  const canCheckout = Boolean(deliveryDate) && meetsMinimum;
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-28 pt-32 lg:px-8">
@@ -82,6 +93,16 @@ export default function CartPage() {
           </div>
 
           <CartSummary />
+
+          {!meetsMinimum && (
+            <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
+              El pedido mínimo es {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
+              <span className="font-semibold text-cream">
+                {formatPrice(amountToMinimumInCents, "ARS")}
+              </span>{" "}
+              para poder confirmar.
+            </p>
+          )}
 
           <Button
             onClick={() => router.push("/checkout")}
