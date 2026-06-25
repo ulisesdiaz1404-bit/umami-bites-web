@@ -297,8 +297,8 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-asado-al-asador",
     name: 'Menú "Asado al asador"',
     description:
-      "Mesa de campo de recepción (fiambres, quesos, empanadas criollas y sándwich de chorizo bombón). La comida: 2 ensaladas a elección (clásica o gourmet), achuras (morcilla y mollejas al limón) y asado de vacío y costillar al asador según espacio disponible.",
-    priceInCents: 5_500_000,
+      "Mesa de campo premium de recepción (fiambres, quesos, empanadas criollas y sándwich de chorizo bombón). La comida: 2 ensaladas a elección (clásica o gourmet), achuras (morcilla y mollejas al limón) y asado de vacío y costillar al asador según espacio disponible. Postre a elección.",
+    priceInCents: 6_200_000,
     currency: "ARS",
     images: [img("menu-asado-al-asador", "Menú Asado al asador")],
     available: true,
@@ -307,10 +307,11 @@ export const MENU_ITEMS: MenuItem[] = [
     type: "package",
     servings: 1,
     includes: [
-      "Mesa de campo de recepción",
+      "Mesa de campo premium de recepción",
       "2 ensaladas a elección (clásica / gourmet)",
       "Achuras: morcilla y mollejas al limón",
       "Asado: vacío y costillar al asador",
+      "Postre a elección: flan casero con DDL o brownie con helado y frutos rojos",
     ],
     metadata: {
       unit: "persona",
@@ -322,7 +323,7 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-pizza-party",
     name: 'Menú "Pizza party"',
     description:
-      "Recepción con mesa de campo, empanadas de carne criollas, dips y brusquetas. La comida: pizzas de diferentes tipos — muzarella, napolitana, primavera, jamón y morrones, fugazzeta y ananá.",
+      "Recepción con mesa de campo, empanadas de carne criollas, dips, brusquetas, mini tarteletas y albondiguitas. La comida: pizzas de diferentes tipos — muzarella, napolitana, primavera, jamón y morrones, fugazzeta y ananá. Postre a elección.",
     priceInCents: 2_900_000,
     currency: "ARS",
     images: [img("menu-pizza-party", "Menú Pizza party")],
@@ -333,8 +334,9 @@ export const MENU_ITEMS: MenuItem[] = [
     servings: 1,
     includes: [
       "Recepción: mesa de campo + empanadas criollas",
-      "Dips y brusquetas surtidas",
+      "Dips, brusquetas, mini tarteletas y albondiguitas",
       "Pizzas: muzarella, napolitana, primavera, jamón y morrones, fugazzeta, ananá",
+      "Postre a elección: crumble de manzana con helado o brownie con helado y frutos rojos",
     ],
     metadata: {
       unit: "persona",
