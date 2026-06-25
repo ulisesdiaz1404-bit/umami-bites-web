@@ -640,9 +640,9 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "torta-frutos-rojos": ["p33.jpg", "p24.jpg"],
   "torta-nuez-ddl": ["p30.jpg", "p20.jpg"],
   "key-lime-pie": ["p32.jpg"],
-  // Bebidas (fotos recortadas de la carta real)
-  "cervezas-artesanales-x6": ["bev-cervezas.jpg"],
-  "vino-malbec-desfachatados": ["bev-vino.jpg"],
+  // Bebidas (fotos reales de producto)
+  "cervezas-artesanales-x6": ["bev-cervezas-2.webp"],
+  "vino-malbec-desfachatados": ["bev-vino-2.webp"],
   "barra-libre-tragos": ["barra-tragos.jpg"],
 };
 

@@ -31,7 +31,7 @@ export function Footer() {
               <li><Link href="/" className="transition-colors hover:text-cream">Inicio</Link></li>
               <li><Link href="/menu" className="transition-colors hover:text-cream">Servicios</Link></li>
               <li><Link href="/menu?servicio=menus" className="transition-colors hover:text-cream">Menús completos</Link></li>
-              <li><Link href="/#quienes-somos" className="transition-colors hover:text-cream">Quiénes somos</Link></li>
+              <li><Link href="/quienes-somos" className="transition-colors hover:text-cream">Quiénes somos</Link></li>
               <li><Link href="/cart" className="transition-colors hover:text-cream">Mi carrito</Link></li>
             </ul>
           </div>
