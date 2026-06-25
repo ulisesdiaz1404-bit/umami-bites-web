@@ -8,6 +8,7 @@ export interface CartItem {
   quantity: number;
   imageUrl: string;
   maxQuantity: number; // Para validar en UI antes de checkout
+  minQuantity?: number; // Mínimo por pedido (ej. menús por persona: 20)
   type: ItemType;
   unit?: string; // ej. "porción" | "persona" | "docena" | "tabla"
   deliveryDate?: string; // ISO date string; requerido en checkout (Fase 2)

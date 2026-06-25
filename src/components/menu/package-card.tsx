@@ -16,6 +16,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
   const isSpecialty = item.metadata?.especialidad === "true";
   const unit = item.metadata?.unit;
   const tagline = item.metadata?.tagline;
+  const minQty = Number(item.metadata?.minQty) || 0;
   // Etiqueta de personas: usa tagline si existe; si es precio por persona,
   // muestra "Precio por persona" en vez del erróneo "Para 1 personas".
   const servingsLabel =
@@ -115,10 +116,20 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
 
         <div className="mt-5 flex items-end justify-between gap-3 border-t border-line pt-4">
           <div>
-            <span className="price text-2xl">
-              {formatPrice(item.priceInCents, item.currency)}
-            </span>
-            {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}
+            <div>
+              <span className="price text-2xl">
+                {formatPrice(item.priceInCents, item.currency)}
+              </span>
+              {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}
+            </div>
+            {minQty > 0 && (
+              <p className="mt-1 text-[0.7rem] leading-tight text-muted">
+                mínimo {minQty} personas · total desde{" "}
+                <span className="font-semibold text-primary">
+                  {formatPrice(item.priceInCents * minQty, item.currency)}
+                </span>
+              </p>
+            )}
           </div>
           <AddToCartButton item={item} label="Reservar" />
         </div>

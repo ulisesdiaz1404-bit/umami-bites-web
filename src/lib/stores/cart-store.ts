@@ -35,8 +35,8 @@ interface CartState {
   toggleCart: () => void;
 }
 
-/** Limita un valor entre 1 y max. */
-const clampQty = (qty: number, max: number) => Math.max(1, Math.min(qty, max));
+/** Limita un valor entre min (default 1) y max. */
+const clampQty = (qty: number, max: number, min = 1) => Math.max(min, Math.min(qty, max));
 
 export const useCartStore = create<CartState>()(
   persist(
@@ -53,14 +53,19 @@ export const useCartStore = create<CartState>()(
               isOpen: true,
               items: state.items.map((i) =>
                 i.menuItemId === item.menuItemId
-                  ? { ...i, quantity: clampQty(i.quantity + quantity, i.maxQuantity) }
+                  ? { ...i, quantity: clampQty(i.quantity + quantity, i.maxQuantity, i.minQuantity) }
                   : i
               ),
             };
           }
+          // Primer alta: respeta el mínimo del ítem (ej. menús arrancan en 20).
+          const min = item.minQuantity ?? 1;
           return {
             isOpen: true,
-            items: [...state.items, { ...item, quantity: clampQty(quantity, item.maxQuantity) }],
+            items: [
+              ...state.items,
+              { ...item, quantity: clampQty(Math.max(quantity, min), item.maxQuantity, min) },
+            ],
           };
         }),
 
@@ -70,7 +75,9 @@ export const useCartStore = create<CartState>()(
       setQuantity: (menuItemId, quantity) =>
         set((state) => ({
           items: state.items.map((i) =>
-            i.menuItemId === menuItemId ? { ...i, quantity: clampQty(quantity, i.maxQuantity) } : i
+            i.menuItemId === menuItemId
+              ? { ...i, quantity: clampQty(quantity, i.maxQuantity, i.minQuantity) }
+              : i
           ),
         })),
 
@@ -78,7 +85,7 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.map((i) =>
             i.menuItemId === menuItemId
-              ? { ...i, quantity: clampQty(i.quantity + 1, i.maxQuantity) }
+              ? { ...i, quantity: clampQty(i.quantity + 1, i.maxQuantity, i.minQuantity) }
               : i
           ),
         })),
@@ -87,7 +94,7 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.map((i) =>
             i.menuItemId === menuItemId
-              ? { ...i, quantity: clampQty(i.quantity - 1, i.maxQuantity) }
+              ? { ...i, quantity: clampQty(i.quantity - 1, i.maxQuantity, i.minQuantity) }
               : i
           ),
         })),

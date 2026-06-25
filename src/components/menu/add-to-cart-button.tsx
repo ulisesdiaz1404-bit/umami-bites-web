@@ -15,7 +15,7 @@ interface AddToCartButtonProps extends Omit<ButtonProps, "onClick" | "children">
 
 export function AddToCartButton({
   item,
-  quantity = 1,
+  quantity,
   label = "Agregar",
   size = "default",
   variant = "default",
@@ -24,6 +24,11 @@ export function AddToCartButton({
 }: AddToCartButtonProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
+
+  // Mínimo por ítem (ej. menús por persona: 20). Si no se pasa cantidad, se
+  // agrega el mínimo (así "Reservar" arranca en 20 para los menús).
+  const minQuantity = Number(item.metadata?.minQty) || 1;
+  const qtyToAdd = quantity ?? minQuantity;
 
   const handleAdd = () => {
     if (!item.available) return;
@@ -35,10 +40,11 @@ export function AddToCartButton({
         priceInCents: item.priceInCents,
         imageUrl: item.images[0]?.url ?? "",
         maxQuantity: item.maxQuantity,
+        minQuantity,
         type: item.type,
         unit: item.metadata?.unit,
       },
-      quantity
+      qtyToAdd
     );
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);

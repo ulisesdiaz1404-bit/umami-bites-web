@@ -97,6 +97,17 @@ export default async function ItemDetailPage({
             </span>
             {unit && <span className="pb-1 text-sm text-muted">/ {unit}</span>}
           </div>
+          {(() => {
+            const minQty = Number(item.metadata?.minQty) || 0;
+            return minQty > 0 ? (
+              <p className="mt-1.5 text-sm text-muted">
+                Mínimo {minQty} personas · total desde{" "}
+                <span className="font-semibold text-primary">
+                  {formatPrice(item.priceInCents * minQty, item.currency)}
+                </span>
+              </p>
+            ) : null;
+          })()}
           {item.metadata?.tierMayor && (
             <p className="mt-1 text-sm text-muted">Opción mayor: {item.metadata.tierMayor}</p>
           )}

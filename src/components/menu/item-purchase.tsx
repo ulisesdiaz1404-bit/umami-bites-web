@@ -8,9 +8,10 @@ import type { MenuItem } from "@/lib/types/menu-item";
 
 /** Panel de compra del detalle: selector de cantidad + agregar al carrito. */
 export function ItemPurchase({ item }: { item: MenuItem }) {
-  const [qty, setQty] = useState(1);
+  const minQty = Number(item.metadata?.minQty) || 1;
+  const [qty, setQty] = useState(minQty);
   const unit = item.metadata?.unit;
-  const dec = () => setQty((q) => Math.max(1, q - 1));
+  const dec = () => setQty((q) => Math.max(minQty, q - 1));
   const inc = () => setQty((q) => Math.min(item.maxQuantity, q + 1));
 
   if (!item.available) {
@@ -27,7 +28,7 @@ export function ItemPurchase({ item }: { item: MenuItem }) {
         <button
           type="button"
           onClick={dec}
-          disabled={qty <= 1}
+          disabled={qty <= minQty}
           aria-label="Restar"
           className="grid h-12 w-12 place-items-center rounded-full text-primary transition-colors hover:bg-surface-2 disabled:opacity-35"
         >

@@ -9,7 +9,9 @@ import type { CartItem as CartItemType } from "@/lib/types/cart";
 
 export function CartItem({ item }: { item: CartItemType }) {
   const { increment, decrement, removeItem } = useCartStore();
+  const minQty = item.minQuantity ?? 1;
   const atMax = item.quantity >= item.maxQuantity;
+  const atMin = item.quantity <= minQty;
 
   return (
     <div className="flex gap-4 py-4">
@@ -45,7 +47,7 @@ export function CartItem({ item }: { item: CartItemType }) {
             <button
               type="button"
               onClick={() => decrement(item.menuItemId)}
-              disabled={item.quantity <= 1}
+              disabled={atMin}
               aria-label="Restar uno"
               className="grid h-8 w-8 place-items-center rounded-full text-primary transition-colors hover:bg-surface-2 disabled:opacity-35"
             >
@@ -68,9 +70,11 @@ export function CartItem({ item }: { item: CartItemType }) {
             {formatPrice(item.priceInCents * item.quantity, "ARS")}
           </span>
         </div>
-        {atMax && (
+        {atMax ? (
           <p className="pt-1 text-[0.7rem] text-muted">Máximo {item.maxQuantity} por pedido</p>
-        )}
+        ) : minQty > 1 && atMin ? (
+          <p className="pt-1 text-[0.7rem] text-muted">Mínimo {minQty} personas</p>
+        ) : null}
       </div>
     </div>
   );

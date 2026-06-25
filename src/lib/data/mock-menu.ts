@@ -246,14 +246,14 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Menú "Carnes desmechadas"',
     description:
       "Sandwichitos de carne vacuna y barbacoa y/o bondiola desmechada al vino tinto, con salsas caseras (queso crema y verdeo, mayonesa de berenjena, mayonesa de ajo, hummus de garbanzo y de morrón, pasta de aceitunas). Con recepción de mesa de campo: tabla de fiambres y quesos, empanadas criollas, dips, brusquetas y mini tarteletas.",
-    priceInCents: 34_000_000,
+    priceInCents: 3_200_000,
     currency: "ARS",
     images: [img("menu-carnes-desmechadas", "Menú Carnes desmechadas")],
     available: true,
-    maxQuantity: 20,
+    maxQuantity: 300,
     category: "Menús",
     type: "package",
-    servings: 20,
+    servings: 1,
     includes: [
       "Recepción: mesa de campo completa",
       "Empanadas criollas y dips caseros",
@@ -261,8 +261,9 @@ export const MENU_ITEMS: MenuItem[] = [
       "6 salsas a elección",
     ],
     metadata: {
-      unit: "menú",
-      tagline: "Menú para ~20 personas",
+      unit: "persona",
+      tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -289,6 +290,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       servicio: "Servicio en domicilio",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
@@ -317,6 +319,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -343,6 +346,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -369,6 +373,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -394,6 +399,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
@@ -417,7 +423,7 @@ export const MENU_ITEMS: MenuItem[] = [
       "Brusquetas variadas + mini tarteletas de rockefort y nuez",
       "Albondiguitas de poroto rojo y garbanzo",
     ],
-    metadata: { unit: "persona", tagline: "Por persona · mínimo 20" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", minQty: "20" },
   },
   {
     id: "menu-isla-saludable",
@@ -439,7 +445,7 @@ export const MENU_ITEMS: MenuItem[] = [
       "Yogurt casero con granola y licuados",
       "Tabla de quesos y dulce casero",
     ],
-    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", tipo: "Complemento saludable" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", minQty: "20", tipo: "Complemento saludable" },
   },
 
   // ------------------------------ BRUNCH -----------------------------
@@ -466,6 +472,7 @@ export const MENU_ITEMS: MenuItem[] = [
     metadata: {
       unit: "persona",
       tagline: "Por persona · mínimo 20",
+      minQty: "20",
       incluye: "Recepción, comida ppal., bebida sin alcohol, vajilla, mantelería y servicio de mesa",
     },
   },
