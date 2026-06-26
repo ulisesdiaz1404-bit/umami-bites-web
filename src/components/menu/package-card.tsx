@@ -79,7 +79,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
             {item.name}
           </h3>
         </Link>
-        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">{item.description}</p>
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-primary/90">{item.description}</p>
 
         {item.includes && item.includes.length > 0 && (
           <div className="mt-4">

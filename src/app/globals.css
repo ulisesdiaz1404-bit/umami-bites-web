@@ -22,7 +22,7 @@
   --color-accent: #b07a3c; /* dorado profundo: CTAs, badges, precios */
   --color-accent-deep: #936230; /* hover de acento */
   --color-on-accent: #fbf6ee; /* texto claro sobre botones dorados */
-  --color-muted: #8a7256; /* texto secundario */
+  --color-muted: #6b5236; /* texto secundario (oscurecido para mejor lectura) */
   --color-cream: #2c1a0e; /* máximo contraste = espresso (titulares) */
 
   /* --- Líneas --- */
@@ -60,8 +60,8 @@ body {
   background: var(--color-bg);
   color: var(--color-primary);
   font-family: var(--font-body);
-  font-weight: 300;
-  line-height: 1.6;
+  font-weight: 400;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

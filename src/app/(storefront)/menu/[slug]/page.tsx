@@ -93,7 +93,7 @@ export default async function ItemDetailPage({
             <PurchasePanel item={item} />
           </div>
 
-          <p className="mt-7 leading-relaxed text-primary/85">{item.description}</p>
+          <p className="mt-7 text-[1.05rem] leading-relaxed text-primary">{item.description}</p>
 
           {item.includes && item.includes.length > 0 && (
             <div className="mt-7">

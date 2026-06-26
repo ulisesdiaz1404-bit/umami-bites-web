@@ -49,7 +49,7 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
             {item.name}
           </h3>
         </Link>
-        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted">{item.description}</p>
+        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-primary/90">{item.description}</p>
 
         <div className="mt-4 flex items-end justify-between gap-3 pt-2">
           <div>
