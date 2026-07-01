@@ -4,11 +4,44 @@ import { createServiceRoleClient } from "@/lib/supabase/admin-client";
 export const runtime = "nodejs";
 
 /**
+ * Rate limit básico en memoria (gratis, sin dependencias externas).
+ * Frena ráfagas de spam desde una misma IP contra el mismo servidor.
+ * Limitación: la memoria no se comparte entre instancias serverless, así que
+ * no es a prueba de todo; para algo robusto haría falta Upstash Redis / Vercel WAF.
+ */
+const RATE_LIMIT_MAX = 6; // pedidos permitidos...
+const RATE_LIMIT_WINDOW_MS = 60_000; // ...por minuto y por IP
+const hits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  // limpieza oportunista para no acumular IPs viejas
+  if (hits.size > 5_000) {
+    for (const [key, times] of hits) {
+      if (times.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) hits.delete(key);
+    }
+  }
+  return recent.length > RATE_LIMIT_MAX;
+}
+
+/**
  * Persiste un pedido confirmado. Usa service role (server-only) para escribir
  * en `orders` sin abrir la tabla al público. Si Supabase no está configurado,
  * responde ok sin guardar para no romper el checkout por WhatsApp.
  */
 export async function POST(request: Request) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { ok: false, error: "Demasiados pedidos seguidos. Esperá un momento." },
+      { status: 429, headers: { "Retry-After": "60" } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
