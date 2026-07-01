@@ -20,7 +20,7 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Umami Bites Catering — El sabor profundo, en tu puerta",
+    default: "Umami Bites Catering — El sabor profundo, en tu mesa",
     template: "%s · Umami Bites Catering",
   },
   description:
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Umami Bites Catering",
-    description: "El sabor profundo, en tu puerta. Catering premium a domicilio.",
+    description: "El sabor profundo, en tu mesa. Catering premium con envío o retiro.",
     locale: "es_AR",
     type: "website",
   },

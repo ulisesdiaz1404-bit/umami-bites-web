@@ -73,8 +73,9 @@ export function HeroSection() {
         })}
 
         {/* Velos para legibilidad del texto y fundido hacia la página clara */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(13,7,3,0.45)_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0d0703]/70 via-transparent to-[#0d0703]/80" />
+        <div className="absolute inset-0 bg-[#0d0703]/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(13,7,3,0.35)_0%,transparent_45%,rgba(13,7,3,0.5)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0d0703]/75 via-[#0d0703]/25 to-[#0d0703]/85" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-bg" />
       </motion.div>
 
@@ -91,7 +92,13 @@ export function HeroSection() {
           <Sparkles className="size-3.5" /> Catering premium a domicilio
         </motion.span>
 
-        <h1 className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] text-[#faf3eb] drop-shadow-[0_2px_24px_rgba(0,0,0,0.65)] sm:text-6xl lg:text-7xl xl:text-8xl">
+        <h1
+          className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] text-[#faf3eb] sm:text-6xl lg:text-7xl xl:text-8xl"
+          style={{
+            textShadow:
+              "0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7), 0 6px 40px rgba(0,0,0,0.5)",
+          }}
+        >
           {["El", "sabor", "profundo,"].map((word, idx) => (
             <motion.span
               key={word}
@@ -110,7 +117,7 @@ export function HeroSection() {
             className="accent-serif block"
             style={{ color: "#b5c46b" }}
           >
-            en tu puerta
+            en tu mesa
           </motion.span>
         </h1>
 
