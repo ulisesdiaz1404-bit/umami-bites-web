@@ -632,7 +632,7 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "picada-encuentro": ["picada-encuentro-1.jpg", "picada-encuentro-2.jpg", "picada-encuentro-3.jpg"],
   // Empanadas (foto nueva: empanadas + canastitas en tabla)
   "empanadas-saltenas": ["empanadas-1.jpg"],
-  "canastitas-surtidas": ["empanadas-1.jpg"],
+  "canastitas-surtidas": ["canastitas-1.jpg"],
   // Complementos (fotos nuevas 2026)
   "shots-guacamole-nachos": ["shots-guacamole.jpg"],
   "brusquetas-surtidas": ["p22.jpg"],
