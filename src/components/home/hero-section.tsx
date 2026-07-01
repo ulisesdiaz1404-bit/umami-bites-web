@@ -89,7 +89,7 @@ export function HeroSection() {
           transition={{ duration: 0.7 }}
           className="eyebrow"
         >
-          <Sparkles className="size-3.5" /> Catering premium a domicilio
+          <Sparkles className="size-3.5" /> Catering premium · Envío o retiro
         </motion.span>
 
         <h1

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s · Umami Bites Catering",
   },
   description:
-    "Catering premium a domicilio: picadas de autor, menús completos (asado, criolla, pizza party, sándwich a la parrilla), brunch, finger food y mesa dulce. Vajilla, mantelería y servicio incluidos.",
+    "Catering premium con envío o retiro: picadas de autor, menús completos (asado, criolla, pizza party, sándwich a la parrilla), brunch, finger food y mesa dulce. Vajilla, mantelería y servicio incluidos.",
   metadataBase: new URL("https://umamibites.com.ar"),
   keywords: [
     "catering a domicilio",

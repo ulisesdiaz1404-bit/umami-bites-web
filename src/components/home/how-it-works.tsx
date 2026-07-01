@@ -10,7 +10,7 @@ const STEPS = [
   {
     icon: CalendarCheck,
     title: "Coordinamos la entrega",
-    text: "Definís fecha y lugar. Llevamos todo a domicilio, salón, quinta u oficina, con vajilla y mantelería.",
+    text: "Definís fecha y lugar. Lo llevamos a domicilio, salón, quinta u oficina —o lo retirás vos—, con vajilla y mantelería.",
   },
   {
     icon: ConciergeBell,
