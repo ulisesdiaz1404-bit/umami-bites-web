@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useState, type ReactNode } from "react";
+import { useActionState, useState, type ReactNode, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Eye } from "lucide-react";
+import { Plus, Eye, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,9 +55,29 @@ export function MenuForm({
   const router = useRouter();
   const [state, formAction, pending] = useActionState(saveMenuItem, initial);
   const [v, setV] = useState<FormValues>(() => fromItem(item));
+  // Preview local (blob) de la foto recién elegida, antes de guardarla.
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
     setV((prev) => ({ ...prev, [key]: value }));
+
+  function onPickFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    setFileError(null);
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setFileError("La foto pesa más de 8 MB. Usá una más liviana.");
+      e.target.value = "";
+      return;
+    }
+    if (filePreview) URL.revokeObjectURL(filePreview);
+    setFilePreview(URL.createObjectURL(file));
+    setFileName(file.name);
+  }
+
+  const previewImage = filePreview ?? v.imageUrl;
 
   return (
     <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
@@ -104,15 +124,39 @@ export function MenuForm({
               className={inputBase}
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="imageUrl">Foto (URL)</Label>
-            <Input
-              id="imageUrl"
-              name="imageUrl"
-              value={v.imageUrl}
-              onChange={(e) => set("imageUrl", e.target.value)}
-              placeholder="/photos/p01.jpg"
-            />
+          <div className="space-y-2">
+            <Label>Foto del plato</Label>
+            <label className="flex cursor-pointer items-center gap-3 rounded-base border border-dashed border-accent/50 bg-accent/5 px-4 py-3 text-sm text-accent transition-colors hover:bg-accent/10">
+              <ImagePlus className="size-5 shrink-0" />
+              <span className="min-w-0 flex-1 truncate">
+                {fileName ?? (v.imageUrl ? "Cambiar foto" : "Subir foto desde tu dispositivo")}
+              </span>
+              <input
+                type="file"
+                name="imageFile"
+                accept="image/*"
+                onChange={onPickFile}
+                className="hidden"
+              />
+            </label>
+            {fileError && <p className="text-xs text-danger">{fileError}</p>}
+            <p className="text-[11px] text-muted">
+              JPG, PNG o WEBP hasta 8 MB. La foto queda guardada y podés cambiarla cuando quieras.
+            </p>
+
+            <details className="text-xs text-muted">
+              <summary className="cursor-pointer select-none py-1 hover:text-cream">
+                O usar una URL manual (avanzado)
+              </summary>
+              <Input
+                id="imageUrl"
+                name="imageUrl"
+                value={v.imageUrl}
+                onChange={(e) => set("imageUrl", e.target.value)}
+                placeholder="/photos/p01.jpg"
+                className="mt-2"
+              />
+            </details>
           </div>
         </div>
 
@@ -261,7 +305,7 @@ export function MenuForm({
         <p className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
           <Eye className="size-4 text-accent" /> Vista previa
         </p>
-        <PreviewCard v={v} />
+        <PreviewCard v={v} image={previewImage} />
         <p className="mt-3 text-xs text-muted">
           Así se ve la tarjeta en la web mientras editás.
         </p>
@@ -282,7 +326,7 @@ function SectionTitle({ children, color }: { children: ReactNode; color: string 
 }
 
 /** Réplica de la card pública del menú, alimentada por el estado del form. */
-function PreviewCard({ v }: { v: FormValues }) {
+function PreviewCard({ v, image }: { v: FormValues; image: string }) {
   const priceCents = Math.round((Number(v.price) || 0) * 100);
   return (
     <article
@@ -290,10 +334,10 @@ function PreviewCard({ v }: { v: FormValues }) {
       style={{ opacity: v.available ? 1 : 0.85 }}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-bg-deep">
-        {v.imageUrl ? (
+        {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={v.imageUrl}
+            src={image}
             alt={v.name}
             className="size-full object-cover"
             style={{ filter: v.available ? "none" : "grayscale(1)" }}

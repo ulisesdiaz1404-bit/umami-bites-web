@@ -14,7 +14,7 @@ const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "font-src 'self' data:",
-  "img-src 'self' data: blob: https://images.unsplash.com",
+  "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co",
   "style-src 'self' 'unsafe-inline'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   // Supabase: auth/REST (https) + realtime (wss) desde el navegador.
@@ -52,6 +52,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Las fotos del menú suben por Server Action; el límite default (1MB) es poco.
+  experimental: { serverActions: { bodySizeLimit: "8mb" } },
   // No anunciar el framework (menos huella para un atacante).
   poweredByHeader: false,
   // No exponer el código fuente original en producción.
@@ -64,7 +66,11 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     qualities: [75, 90],
-    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      // Fotos del menú subidas por el dueño desde el panel (Supabase Storage).
+      { protocol: "https", hostname: "*.supabase.co" },
+    ],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
