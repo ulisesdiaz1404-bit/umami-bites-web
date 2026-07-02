@@ -652,13 +652,13 @@ const REAL_PHOTOS: Record<string, string[]> = {
   "isla-saludable": ["isla-saludable-1.jpg", "isla-saludable-2.jpg"],
   // Brunch + mesa dulce + tortas
   "menu-brunch": ["brunch-1.jpg", "brunch-2.jpg"],
-  "mesa-dulce": ["mesa-dulce-spread.jpg", "p20.jpg", "p30.jpg", "p33.jpg", "p32.jpg"],
+  "mesa-dulce": ["mesa-dulce-1.jpg", "mesa-dulce-2.jpg", "mesa-dulce-3.jpg", "mesa-dulce-4.jpg", "mesa-dulce-5.jpg"],
   "torta-brownie-ddl": ["p20.jpg"],
   "torta-frutos-rojos": ["p33.jpg", "p24.jpg"],
   "torta-nuez-ddl": ["p30.jpg", "p20.jpg"],
   "key-lime-pie": ["p32.jpg"],
   // Bebidas (fotos reales de producto)
-  "cervezas-artesanales-x6": ["bev-cervezas-2.webp"],
+  "cervezas-artesanales-x6": ["bev-cervezas.jpg"],
   "vino-malbec-desfachatados": ["bev-vino-2.webp"],
   "barra-libre-tragos": ["barra-tragos.jpg"],
 };
