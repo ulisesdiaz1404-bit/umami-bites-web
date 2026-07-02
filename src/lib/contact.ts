@@ -1,8 +1,8 @@
 // Datos de contacto de Umami Bites Catering (Fase 2: mover a CMS/env si cambian).
 
 export const CONTACT = {
-  instagram: "@umamibites",
-  instagramUrl: "https://instagram.com/umamibites",
+  instagram: "@umami.bites.catering",
+  instagramUrl: "https://www.instagram.com/umami.bites.catering/",
   phonePrimary: "(11) 5988-7136",
   phoneSecondary: "(11) 3668-5271",
   /** Número en formato internacional para enlaces wa.me (sin signos). */
