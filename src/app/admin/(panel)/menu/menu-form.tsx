@@ -17,6 +17,7 @@ interface FormValues {
   slug: string;
   description: string;
   price: string;
+  cost: string;
   maxQuantity: string;
   category: string;
   type: "dish" | "package";
@@ -27,11 +28,13 @@ interface FormValues {
 }
 
 function fromItem(item?: MenuItem): FormValues {
+  const costCents = Number(item?.metadata?.cost ?? 0);
   return {
     name: item?.name ?? "",
     slug: item?.slug ?? "",
     description: item?.description ?? "",
     price: item ? String(item.priceInCents / 100) : "",
+    cost: costCents > 0 ? String(costCents / 100) : "",
     maxQuantity: String(item?.maxQuantity ?? 10),
     category: item?.category ?? "",
     type: item?.type ?? "dish",
@@ -165,7 +168,7 @@ export function MenuForm({
           <SectionTitle color="#2f8f4e">Precio y stock</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label htmlFor="price">Precio (ARS)</Label>
+              <Label htmlFor="price">Precio de venta (ARS)</Label>
               <Input
                 id="price"
                 name="price"
@@ -177,16 +180,32 @@ export function MenuForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="maxQuantity">Máx. por pedido</Label>
+              <Label htmlFor="cost">Costo (ARS)</Label>
               <Input
-                id="maxQuantity"
-                name="maxQuantity"
+                id="cost"
+                name="cost"
                 type="number"
-                min="1"
-                value={v.maxQuantity}
-                onChange={(e) => set("maxQuantity", e.target.value)}
+                min="0"
+                step="0.01"
+                value={v.cost}
+                onChange={(e) => set("cost", e.target.value)}
+                placeholder="lo que te cuesta"
               />
             </div>
+          </div>
+
+          <MarginHint price={v.price} cost={v.cost} />
+
+          <div className="space-y-1.5">
+            <Label htmlFor="maxQuantity">Máx. por pedido</Label>
+            <Input
+              id="maxQuantity"
+              name="maxQuantity"
+              type="number"
+              min="1"
+              value={v.maxQuantity}
+              onChange={(e) => set("maxQuantity", e.target.value)}
+            />
           </div>
 
           <label
@@ -310,6 +329,29 @@ export function MenuForm({
           Así se ve la tarjeta en la web mientras editás.
         </p>
       </div>
+    </div>
+  );
+}
+
+function MarginHint({ price, cost }: { price: string; cost: string }) {
+  const p = Number(price) || 0;
+  const c = Number(cost) || 0;
+  if (p <= 0 || c <= 0) return null;
+  const profit = p - c;
+  const margin = Math.round((profit / p) * 100);
+  const positive = profit >= 0;
+  return (
+    <div
+      className="flex items-center justify-between rounded-base px-4 py-2.5 text-sm"
+      style={{
+        background: positive ? "#e6f1e8" : "#f8e7e3",
+        color: positive ? "#2f6b3f" : "#a83422",
+      }}
+    >
+      <span className="font-medium">Ganancia por unidad</span>
+      <span className="font-semibold tabular-nums">
+        {formatPrice(Math.round(profit * 100), "ARS")} ({margin}%)
+      </span>
     </div>
   );
 }

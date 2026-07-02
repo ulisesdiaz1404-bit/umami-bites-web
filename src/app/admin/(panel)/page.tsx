@@ -19,12 +19,19 @@ export default async function OrdersPage() {
     );
   }
 
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data, error }, { data: menuData }] = await Promise.all([
+    supabase.from("orders").select("*").order("created_at", { ascending: false }),
+    supabase.from("menu_items").select("id, metadata"),
+  ]);
 
   const orders = (data ?? []) as OrderRecord[];
+
+  // Mapa costo por ítem (centavos) desde metadata.cost, para calcular ganancia.
+  const costMap: Record<string, number> = {};
+  for (const m of (menuData ?? []) as { id: string; metadata: Record<string, string> | null }[]) {
+    const c = Number(m.metadata?.cost ?? 0);
+    if (c > 0) costMap[m.id] = c;
+  }
 
   if (error) {
     return (
@@ -35,5 +42,5 @@ export default async function OrdersPage() {
     );
   }
 
-  return <OrdersDashboard orders={orders} />;
+  return <OrdersDashboard orders={orders} costMap={costMap} />;
 }

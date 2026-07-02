@@ -7,6 +7,8 @@ import {
   ShoppingBag,
   Receipt,
   CalendarDays,
+  TrendingUp,
+  Coins,
   CheckCircle2,
   XCircle,
   Truck,
@@ -30,12 +32,24 @@ import {
 
 type Filter = "todos" | OrderStatus;
 
-export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
+export function OrdersDashboard({
+  orders,
+  costMap = {},
+}: {
+  orders: OrderRecord[];
+  costMap?: Record<string, number>;
+}) {
   const [filter, setFilter] = useState<Filter>("todos");
 
   const metrics = useMemo(() => {
     const active = orders.filter((o) => statusOf(o.status) !== "cancelado");
     const revenue = active.reduce((s, o) => s + o.total_in_cents, 0);
+    // Costo de mercadería: suma del costo actual de cada ítem × cantidad.
+    const cost = active.reduce(
+      (s, o) => s + o.items.reduce((si, it) => si + (costMap[it.menuItemId] ?? 0) * it.quantity, 0),
+      0
+    );
+    const hasCosts = Object.keys(costMap).length > 0;
     const now = new Date();
     const monthRevenue = active
       .filter((o) => {
@@ -46,6 +60,9 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
     const byStatus = (s: OrderStatus) => orders.filter((o) => statusOf(o.status) === s).length;
     return {
       revenue,
+      cost,
+      profit: revenue - cost,
+      hasCosts,
       monthRevenue,
       activeCount: active.length,
       avgTicket: active.length ? Math.round(revenue / active.length) : 0,
@@ -53,7 +70,7 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
       entregados: byStatus("entregado"),
       cancelados: byStatus("cancelado"),
     };
-  }, [orders]);
+  }, [orders, costMap]);
 
   const filtered = useMemo(
     () => (filter === "todos" ? orders : orders.filter((o) => statusOf(o.status) === filter)),
@@ -79,19 +96,37 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {metrics.hasCosts && (
+          <Kpi
+            icon={TrendingUp}
+            label="Ganancia estimada"
+            value={formatPrice(metrics.profit, "ARS")}
+            accent="#2f8f4e"
+            tint="#e6f1e8"
+          />
+        )}
         <Kpi
           icon={Wallet}
           label="Facturado (activos)"
           value={formatPrice(metrics.revenue, "ARS")}
-          accent="#2f8f4e"
-          tint="#e6f1e8"
+          accent="#2563eb"
+          tint="#e9effc"
         />
+        {metrics.hasCosts && (
+          <Kpi
+            icon={Coins}
+            label="Costo de mercadería"
+            value={formatPrice(metrics.cost, "ARS")}
+            accent="#a83422"
+            tint="#f8e7e3"
+          />
+        )}
         <Kpi
           icon={CalendarDays}
           label="Este mes"
           value={formatPrice(metrics.monthRevenue, "ARS")}
-          accent="#2563eb"
-          tint="#e9effc"
+          accent="#0d9488"
+          tint="#e2f3f1"
         />
         <Kpi
           icon={Receipt}

@@ -76,6 +76,25 @@ export async function saveMenuItem(
   let imageUrl = String(formData.get("imageUrl") ?? "").trim();
   const servingsRaw = String(formData.get("servings") ?? "").trim();
 
+  // Costo → metadata.cost (en centavos), preservando otras claves (ej. unit).
+  const costRaw = String(formData.get("cost") ?? "").trim();
+  const costCents = costRaw ? Math.max(0, Math.round(Number(costRaw) * 100)) : 0;
+  let metadata: Record<string, string> | null = null;
+  if (id) {
+    const { data: existing } = await supabase
+      .from("menu_items")
+      .select("metadata")
+      .eq("id", id)
+      .single();
+    metadata = (existing?.metadata as Record<string, string> | null) ?? null;
+  }
+  if (costCents > 0) {
+    metadata = { ...(metadata ?? {}), cost: String(costCents) };
+  } else if (metadata && "cost" in metadata) {
+    const { cost: _drop, ...rest } = metadata;
+    metadata = Object.keys(rest).length ? rest : null;
+  }
+
   // Si el dueño subió un archivo, se sube a Storage y su URL pisa a la manual.
   const imageFile = formData.get("imageFile");
   if (imageFile instanceof File && imageFile.size > 0) {
@@ -97,6 +116,7 @@ export async function saveMenuItem(
     servings: servingsRaw ? Number(servingsRaw) : null,
     includes: parseIncludes(String(formData.get("includes") ?? "")),
     images: imageUrl ? [{ url: imageUrl, alt: name }] : [],
+    metadata,
   };
 
   const result = id
