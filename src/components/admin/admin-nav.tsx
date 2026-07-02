@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, UtensilsCrossed } from "lucide-react";
+import {
+  ClipboardList,
+  UtensilsCrossed,
+  CalendarDays,
+  BarChart3,
+  Users,
+} from "lucide-react";
 
 const LINKS = [
   { href: "/admin", label: "Pedidos", icon: ClipboardList },
+  { href: "/admin/agenda", label: "Agenda", icon: CalendarDays },
+  { href: "/admin/estadisticas", label: "Estadísticas", icon: BarChart3 },
+  { href: "/admin/clientes", label: "Clientes", icon: Users },
   { href: "/admin/menu", label: "Menú", icon: UtensilsCrossed },
 ];
 

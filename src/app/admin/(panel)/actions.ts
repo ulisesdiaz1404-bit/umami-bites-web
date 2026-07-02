@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { OrderStatus } from "@/lib/admin/orders";
 
-export type OrderStatus = "nuevo" | "confirmado" | "entregado" | "cancelado";
+export type { OrderStatus };
 
 export interface OrderActionResult {
   ok: boolean;

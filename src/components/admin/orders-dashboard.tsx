@@ -19,41 +19,14 @@ import {
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice, formatUnit } from "@/lib/utils";
 import { PAYMENT_LABELS } from "@/lib/whatsapp-order";
-import { updateOrderStatus, type OrderStatus } from "@/app/admin/(panel)/actions";
-
-// --- Estados: etiqueta + paleta (colorido, fuera del crema) -----------------
-const STATUS: Record<
-  OrderStatus,
-  { label: string; fg: string; bg: string; border: string; dot: string }
-> = {
-  nuevo: { label: "Nuevo", fg: "#1f4fb0", bg: "#e9effc", border: "#c9dbf8", dot: "#2563eb" },
-  confirmado: { label: "Confirmado", fg: "#8a5a1e", bg: "#f7edda", border: "#e8d3ac", dot: "#c9871f" },
-  entregado: { label: "Entregado", fg: "#2f6b3f", bg: "#e6f1e8", border: "#cfe4d3", dot: "#2f8f4e" },
-  cancelado: { label: "Cancelado", fg: "#a83422", bg: "#f8e7e3", border: "#efc7bd", dot: "#c0563f" },
-};
-
-function statusOf(o: OrderRecord): OrderStatus {
-  return (["nuevo", "confirmado", "entregado", "cancelado"] as OrderStatus[]).includes(
-    o.status as OrderStatus
-  )
-    ? (o.status as OrderStatus)
-    : "nuevo";
-}
-
-function waHref(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  const full = digits.startsWith("54") ? digits : `54${digits}`;
-  return `https://wa.me/${full}`;
-}
-
-function fmtDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("es-AR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+import { updateOrderStatus } from "@/app/admin/(panel)/actions";
+import {
+  STATUS_META as STATUS,
+  statusOf,
+  waHref,
+  fmtDateTime,
+  type OrderStatus,
+} from "@/lib/admin/orders";
 
 type Filter = "todos" | OrderStatus;
 
@@ -61,7 +34,7 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
   const [filter, setFilter] = useState<Filter>("todos");
 
   const metrics = useMemo(() => {
-    const active = orders.filter((o) => statusOf(o) !== "cancelado");
+    const active = orders.filter((o) => statusOf(o.status) !== "cancelado");
     const revenue = active.reduce((s, o) => s + o.total_in_cents, 0);
     const now = new Date();
     const monthRevenue = active
@@ -70,7 +43,7 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
       })
       .reduce((s, o) => s + o.total_in_cents, 0);
-    const byStatus = (s: OrderStatus) => orders.filter((o) => statusOf(o) === s).length;
+    const byStatus = (s: OrderStatus) => orders.filter((o) => statusOf(o.status) === s).length;
     return {
       revenue,
       monthRevenue,
@@ -83,14 +56,14 @@ export function OrdersDashboard({ orders }: { orders: OrderRecord[] }) {
   }, [orders]);
 
   const filtered = useMemo(
-    () => (filter === "todos" ? orders : orders.filter((o) => statusOf(o) === filter)),
+    () => (filter === "todos" ? orders : orders.filter((o) => statusOf(o.status) === filter)),
     [orders, filter]
   );
 
   const counts: Record<Filter, number> = {
     todos: orders.length,
     nuevo: metrics.nuevos,
-    confirmado: orders.filter((o) => statusOf(o) === "confirmado").length,
+    confirmado: orders.filter((o) => statusOf(o.status) === "confirmado").length,
     entregado: metrics.entregados,
     cancelado: metrics.cancelados,
   };
@@ -205,7 +178,7 @@ function OrderCard({ order }: { order: OrderRecord }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const status = statusOf(order);
+  const status = statusOf(order.status);
   const meta = STATUS[status];
 
   function change(next: OrderStatus, confirmMsg?: string) {
