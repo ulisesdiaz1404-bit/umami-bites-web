@@ -4,6 +4,7 @@ import { formatPrice } from "@/lib/utils";
 import type { MenuItem } from "@/lib/types/menu-item";
 import { MenuForm } from "./menu-form";
 import { DeleteButton } from "./delete-button";
+import { AvailabilityToggle } from "./availability-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export default async function AdminMenuPage({
 
   if (!supabase) {
     return (
-      <div className="rounded-xl border border-line bg-surface p-8">
+      <div className="rounded-2xl border border-line bg-surface p-8">
         <h1 className="font-display text-2xl text-cream">Menú</h1>
         <p className="mt-3 text-sm text-muted">
           Supabase no está configurado. Seguí <code>SETUP-SUPABASE.md</code> y corré el seed
@@ -67,51 +68,71 @@ export default async function AdminMenuPage({
 
   const items = ((data ?? []) as MenuItemRow[]).map(rowToItem);
   const editing = edit ? items.find((i) => i.id === edit) : undefined;
+  const disponibles = items.filter((i) => i.available).length;
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
-      <section>
-        <h1 className="font-display text-3xl text-cream">Menú</h1>
-        <p className="mt-2 text-sm text-muted">{items.length} ítems. Editá precios y disponibilidad.</p>
-
-        {error && (
-          <p className="mt-4 rounded-base border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-            {error.message}
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl text-cream">Menú</h1>
+          <p className="mt-1 text-sm text-muted">
+            {items.length} ítems · {disponibles} disponibles. Tocá el interruptor para activar/ocultar
+            al instante.
           </p>
-        )}
+        </div>
+      </div>
 
-        <ul className="mt-6 space-y-2">
-          {items.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center justify-between gap-3 rounded-base border border-line bg-surface px-4 py-3"
-            >
-              <div className="min-w-0">
-                <p className="truncate text-sm text-cream">
-                  {item.name}{" "}
-                  {!item.available && <span className="text-xs text-danger">(no disp.)</span>}
-                </p>
-                <p className="text-xs text-muted">
-                  {item.category} · {formatPrice(item.priceInCents, "ARS")}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
+      {error && (
+        <p className="rounded-base border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+          {error.message}
+        </p>
+      )}
+
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
+        {/* Lista de ítems */}
+        <aside className="space-y-2">
+          {items.map((item) => {
+            const isEditing = editing?.id === item.id;
+            return (
+              <div
+                key={item.id}
+                className={`flex items-center gap-3 rounded-xl border bg-surface p-2.5 transition-colors ${
+                  isEditing ? "border-accent ring-1 ring-accent/30" : "border-line"
+                }`}
+              >
+                <div className="size-12 shrink-0 overflow-hidden rounded-lg bg-bg-deep">
+                  {item.images[0]?.url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.images[0].url}
+                      alt={item.name}
+                      className="size-full object-cover"
+                      style={{ filter: item.available ? "none" : "grayscale(1)" }}
+                    />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-cream">{item.name}</p>
+                  <p className="text-xs text-muted">
+                    {item.category} · {formatPrice(item.priceInCents, "ARS")}
+                  </p>
+                </div>
+                <AvailabilityToggle id={item.id} available={item.available} />
                 <a
                   href={`/admin/menu?edit=${item.id}`}
-                  className="rounded-full px-3 py-1.5 text-xs text-accent transition-colors hover:bg-accent/10"
+                  className="rounded-full px-3 py-1.5 text-xs font-medium text-accent transition-colors hover:bg-accent/10"
                 >
                   Editar
                 </a>
                 <DeleteButton id={item.id} />
               </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+            );
+          })}
+        </aside>
 
-      <section className="lg:sticky lg:top-10 lg:h-fit">
+        {/* Editor + vista previa */}
         <MenuForm key={editing?.id ?? "new"} item={editing} categories={[...CATEGORIES]} />
-      </section>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SignOutButton } from "@/components/admin/sign-out-button";
+import { AdminNav } from "@/components/admin/admin-nav";
 
 export const metadata: Metadata = {
   title: "Panel · Umami Bites",
@@ -10,23 +10,14 @@ export const metadata: Metadata = {
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-bg">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <nav className="flex items-center gap-2">
-            <span className="mr-3 font-display text-lg text-cream">Umami Admin</span>
-            <Link
-              href="/admin"
-              className="rounded-full px-3 py-1.5 text-sm text-primary/80 transition-colors hover:bg-surface-2 hover:text-cream"
-            >
-              Pedidos
-            </Link>
-            <Link
-              href="/admin/menu"
-              className="rounded-full px-3 py-1.5 text-sm text-primary/80 transition-colors hover:bg-surface-2 hover:text-cream"
-            >
-              Menú
-            </Link>
-          </nav>
+      <header className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
+          <div className="flex items-center gap-4">
+            <span className="font-display text-lg text-cream">
+              Umami <span className="text-accent">Admin</span>
+            </span>
+            <AdminNav />
+          </div>
           <SignOutButton />
         </div>
       </header>

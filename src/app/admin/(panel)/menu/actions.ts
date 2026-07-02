@@ -69,6 +69,20 @@ export async function saveMenuItem(
   return { ok: true };
 }
 
+/** Cambia solo la disponibilidad de un ítem (toggle rápido desde la lista). */
+export async function setAvailability(id: string, available: boolean): Promise<MenuFormState> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "Supabase no está configurado." };
+
+  const { error } = await supabase.from("menu_items").update({ available }).eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/menu");
+  revalidatePath("/menu");
+  revalidatePath("/");
+  return { ok: true };
+}
+
 /** Borra un ítem del menú. */
 export async function deleteMenuItem(id: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
