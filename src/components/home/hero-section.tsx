@@ -91,8 +91,10 @@ export function HeroSection() {
         </motion.span>
 
         <h1
-          className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] text-[#FBF6EC] sm:text-6xl lg:text-7xl xl:text-8xl"
+          className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] sm:text-6xl lg:text-7xl xl:text-8xl"
           style={{
+            // Inline gana al `h1{color:var(--color-cream)}` (espresso) sin @layer.
+            color: "#FBF6EC",
             textShadow:
               "0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7), 0 6px 40px rgba(0,0,0,0.5)",
           }}
