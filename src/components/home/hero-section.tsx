@@ -115,7 +115,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.55, duration: 0.8, ease }}
             className="accent-serif block"
-            style={{ color: "#FBF6EC" }}
+            style={{ color: "#d59b52" }}
           >
             en tu mesa
           </motion.span>
