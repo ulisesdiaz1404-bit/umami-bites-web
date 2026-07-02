@@ -22,7 +22,6 @@ const SLIDES = [
 const INTERVAL = 5200; // ms por imagen
 const FADE = 1.5; // s de crossfade
 const ease = [0.22, 0.8, 0.2, 1] as const;
-const KEN_BURNS = (INTERVAL + FADE * 1000) / 1000; // duración del zoom activo
 
 export function HeroSection() {
   const [index, setIndex] = useState(0);
@@ -52,21 +51,29 @@ export function HeroSection() {
               key={src}
               aria-hidden={!active}
               initial={false}
-              animate={{ opacity: active ? 1 : 0, scale: active ? 1.16 : 1.04 }}
-              transition={{
-                opacity: { duration: FADE, ease },
-                scale: { duration: active ? KEN_BURNS : 0, ease: "linear" },
-              }}
-              className="absolute inset-0 will-change-[opacity,transform] [transform:translateZ(0)]"
+              animate={{ opacity: active ? 1 : 0 }}
+              transition={{ opacity: { duration: FADE, ease } }}
+              className="absolute inset-0 will-change-[opacity] [transform:translateZ(0)]"
             >
+              {/* Fondo difuminado que llena la pantalla extendiendo la misma foto */}
+              <Image
+                src={src}
+                alt=""
+                aria-hidden
+                fill
+                quality={55}
+                sizes="100vw"
+                className="scale-110 object-cover blur-2xl brightness-[0.6]"
+              />
+              {/* Foto completa y nítida, centrada: no se recorta nada */}
               <Image
                 src={src}
                 alt="Catering elegante de Umami Bites"
                 fill
                 priority={idx < 2}
-                quality={90}
+                quality={95}
                 sizes="100vw"
-                className="object-cover"
+                className="object-contain"
               />
             </motion.div>
           );
@@ -93,7 +100,7 @@ export function HeroSection() {
         </motion.span>
 
         <h1
-          className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] text-[#faf3eb] sm:text-6xl lg:text-7xl xl:text-8xl"
+          className="mt-6 max-w-3xl font-display text-5xl leading-[1.02] text-[#E7C07C] sm:text-6xl lg:text-7xl xl:text-8xl"
           style={{
             textShadow:
               "0 1px 3px rgba(0,0,0,0.9), 0 2px 12px rgba(0,0,0,0.7), 0 6px 40px rgba(0,0,0,0.5)",
@@ -115,7 +122,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.55, duration: 0.8, ease }}
             className="accent-serif block"
-            style={{ color: "#b5c46b" }}
+            style={{ color: "#E7C07C" }}
           >
             en tu mesa
           </motion.span>
