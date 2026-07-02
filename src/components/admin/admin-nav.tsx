@@ -9,6 +9,7 @@ import {
   BarChart3,
   Users,
   Tags,
+  Settings,
 } from "lucide-react";
 
 const LINKS = [
@@ -18,6 +19,7 @@ const LINKS = [
   { href: "/admin/clientes", label: "Clientes", icon: Users },
   { href: "/admin/menu", label: "Menú", icon: UtensilsCrossed },
   { href: "/admin/categorias", label: "Categorías", icon: Tags },
+  { href: "/admin/configuracion", label: "Configuración", icon: Settings },
 ];
 
 export function AdminNav() {

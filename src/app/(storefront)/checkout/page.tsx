@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { useCart } from "@/hooks/use-cart";
+import { useSettings } from "@/components/settings-context";
 import { formatPrice, formatUnit, cn } from "@/lib/utils";
-import { CONTACT } from "@/lib/contact";
 import {
   buildOrderWhatsappHref,
   type PaymentMethod,
@@ -48,6 +48,7 @@ export default function CheckoutPage() {
     amountToMinimumInCents,
     minOrderInCents,
   } = useCart();
+  const settings = useSettings();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -116,7 +117,7 @@ export default function CheckoutPage() {
       totalInCents,
     };
 
-    const href = buildOrderWhatsappHref(CONTACT.ordersWhatsapp, payload);
+    const href = buildOrderWhatsappHref(settings.ordersWhatsapp, payload);
 
     // Guarda el pedido en la DB en segundo plano (no bloquea el redirect; si no
     // hay Supabase configurado, el endpoint responde ok sin guardar).

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCartStore, SHIPPING_IN_CENTS, MIN_ORDER_IN_CENTS } from "@/lib/stores/cart-store";
+import { useCartStore } from "@/lib/stores/cart-store";
+import { useSettings } from "@/components/settings-context";
 
 /**
  * Hook de conveniencia sobre el store del carrito.
@@ -10,18 +11,19 @@ import { useCartStore, SHIPPING_IN_CENTS, MIN_ORDER_IN_CENTS } from "@/lib/store
  */
 export function useCart() {
   const store = useCartStore();
+  const { shippingInCents: shipping, minOrderInCents: minOrder } = useSettings();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => setHydrated(true), []);
 
   const totalItems = store.items.reduce((acc, i) => acc + i.quantity, 0);
   const subtotalInCents = store.items.reduce((acc, i) => acc + i.priceInCents * i.quantity, 0);
-  const shippingInCents = store.items.length > 0 ? SHIPPING_IN_CENTS : 0;
+  const shippingInCents = store.items.length > 0 ? shipping : 0;
   const totalInCents = subtotalInCents + shippingInCents;
 
   // Mínimo de compra: se evalúa sobre el subtotal de productos.
-  const meetsMinimum = subtotalInCents >= MIN_ORDER_IN_CENTS;
-  const amountToMinimumInCents = Math.max(0, MIN_ORDER_IN_CENTS - subtotalInCents);
+  const meetsMinimum = subtotalInCents >= minOrder;
+  const amountToMinimumInCents = Math.max(0, minOrder - subtotalInCents);
 
   return {
     ...store,
@@ -31,7 +33,7 @@ export function useCart() {
     shippingInCents,
     totalInCents,
     isEmpty: store.items.length === 0,
-    minOrderInCents: MIN_ORDER_IN_CENTS,
+    minOrderInCents: minOrder,
     meetsMinimum,
     amountToMinimumInCents,
   };

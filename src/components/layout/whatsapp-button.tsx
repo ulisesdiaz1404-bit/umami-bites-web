@@ -1,13 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { WHATSAPP_HREF } from "@/lib/contact";
+import { useSettings } from "@/components/settings-context";
+import { whatsappHref } from "@/lib/data/settings";
 
 /** Botón flotante de WhatsApp con pulso suave. */
 export function WhatsappButton() {
+  const settings = useSettings();
   return (
     <motion.a
-      href={WHATSAPP_HREF}
+      href={whatsappHref(settings.whatsapp)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Escribinos por WhatsApp"

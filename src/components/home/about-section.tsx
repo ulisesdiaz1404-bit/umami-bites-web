@@ -3,10 +3,14 @@ import Link from "next/link";
 import { Instagram, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
-import { CONTACT, WHATSAPP_HREF } from "@/lib/contact";
+import { CONTACT } from "@/lib/contact";
+import { whatsappHref } from "@/lib/data/settings";
+import { getSettings } from "@/lib/data/settings.server";
 
 /** Quiénes somos — presentación del servicio de catering. */
-export function AboutSection() {
+export async function AboutSection() {
+  const settings = await getSettings();
+  const waHref = whatsappHref(settings.whatsapp);
   return (
     <section id="quienes-somos" className="relative overflow-hidden border-y border-line bg-bg-deep">
       <div className="grain absolute inset-0" />
@@ -45,7 +49,7 @@ export function AboutSection() {
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Button asChild size="lg">
-              <Link href={WHATSAPP_HREF} target="_blank" rel="noopener noreferrer">
+              <Link href={waHref} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="size-4" /> Cotizá tu evento
               </Link>
             </Button>

@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { Instagram, Phone } from "lucide-react";
+import { Instagram, Phone, MapPin, Clock } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
-import { CONTACT, WHATSAPP_HREF } from "@/lib/contact";
+import { CONTACT } from "@/lib/contact";
+import { DEFAULT_SETTINGS, whatsappHref, type BusinessSettings } from "@/lib/data/settings";
 
 const EVENTS = ["Reuniones con amigos y familia", "Cumpleaños", "Eventos empresariales", "Casamientos", "Y mucho más…"];
 
-export function Footer() {
+export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSettings }) {
+  const waHref = whatsappHref(settings.whatsapp);
   return (
     <footer className="relative overflow-hidden border-t border-line bg-bg-deep">
       <div className="grain absolute inset-0" />
@@ -19,10 +21,25 @@ export function Footer() {
               domicilio, salones, quintas y oficinas. Una buena picada inicia un gran encuentro.
             </p>
             <Button asChild variant="outline" size="sm">
-              <a href={WHATSAPP_HREF} target="_blank" rel="noopener noreferrer">
+              <a href={waHref} target="_blank" rel="noopener noreferrer">
                 Cotizá tu evento
               </a>
             </Button>
+
+            {(settings.address || settings.hours) && (
+              <ul className="space-y-2 pt-1 text-sm text-muted">
+                {settings.address && (
+                  <li className="flex items-start gap-2">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-accent" /> {settings.address}
+                  </li>
+                )}
+                {settings.hours && (
+                  <li className="flex items-start gap-2">
+                    <Clock className="mt-0.5 size-4 shrink-0 text-accent" /> {settings.hours}
+                  </li>
+                )}
+              </ul>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -60,12 +77,12 @@ export function Footer() {
               <Instagram className="size-4 text-accent" /> {CONTACT.instagram}
             </a>
             <a
-              href={WHATSAPP_HREF}
+              href={waHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 transition-colors hover:text-cream"
             >
-              <Phone className="size-4 text-accent" /> {CONTACT.phonePrimary}
+              <Phone className="size-4 text-accent" /> {settings.phonePrimary}
             </a>
           </div>
         </div>
