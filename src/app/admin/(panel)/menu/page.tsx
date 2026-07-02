@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { CATEGORIES } from "@/lib/data/mock-menu";
 import { formatPrice } from "@/lib/utils";
 import type { MenuItem } from "@/lib/types/menu-item";
+import { getCategories } from "@/lib/data/categories";
 import { MenuForm } from "./menu-form";
 import { DeleteButton } from "./delete-button";
 import { AvailabilityToggle } from "./availability-toggle";
@@ -70,6 +70,11 @@ export default async function AdminMenuPage({
   const editing = edit ? items.find((i) => i.id === edit) : undefined;
   const disponibles = items.filter((i) => i.available).length;
 
+  const cats = await getCategories();
+  const categoryNames = Array.from(
+    new Set([...cats.map((c) => c.name), ...items.map((i) => i.category)])
+  ).filter(Boolean);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -131,7 +136,7 @@ export default async function AdminMenuPage({
         </aside>
 
         {/* Editor + vista previa */}
-        <MenuForm key={editing?.id ?? "new"} item={editing} categories={[...CATEGORIES]} />
+        <MenuForm key={editing?.id ?? "new"} item={editing} categories={categoryNames} />
       </div>
     </div>
   );

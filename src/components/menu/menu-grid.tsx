@@ -23,20 +23,30 @@ interface MenuGridProps {
   items: MenuItem[];
   categories: readonly string[];
   initialGroup?: GroupFilter;
+  /** Mapa categoría → grupo (editable en el panel). Fallback: serviceGroupOf. */
+  groupMap?: Record<string, ServiceGroup>;
 }
 
-export function MenuGrid({ items, categories, initialGroup = "all" }: MenuGridProps) {
+export function MenuGrid({
+  items,
+  categories,
+  initialGroup = "all",
+  groupMap = {},
+}: MenuGridProps) {
   const [group, setGroup] = useState<GroupFilter>(initialGroup);
   const [category, setCategory] = useState<string>("all");
+
+  const groupOf = (cat: string): ServiceGroup => groupMap[cat] ?? serviceGroupOf(cat);
 
   const filtered = useMemo(
     () =>
       items.filter(
         (i) =>
-          (group === "all" || serviceGroupOf(i.category) === group) &&
+          (group === "all" || groupOf(i.category) === group) &&
           (category === "all" || i.category === category)
       ),
-    [items, group, category]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [items, group, category, groupMap]
   );
 
   return (

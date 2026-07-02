@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { MenuGrid } from "@/components/menu/menu-grid";
 import type { GroupFilter } from "@/components/menu/menu-grid";
 import { Reveal } from "@/components/ui/reveal";
-import { getAllItems, CATEGORIES } from "@/lib/data/menu";
+import { getAllItems } from "@/lib/data/menu";
+import { getCategories, groupMapOf } from "@/lib/data/categories";
 
 // ISR: refleja ediciones del admin sin redeploy.
 export const revalidate = 60;
@@ -26,7 +27,12 @@ export default async function MenuPage({
   searchParams: Promise<{ servicio?: string }>;
 }) {
   const { servicio } = await searchParams;
-  const items = await getAllItems();
+  const [items, cats] = await Promise.all([getAllItems(), getCategories()]);
+  // Nombres para el dropdown: unión de categorías definidas + las que usan los ítems.
+  const names = Array.from(
+    new Set([...cats.map((c) => c.name), ...items.map((i) => i.category)])
+  ).filter(Boolean);
+  const groupMap = groupMapOf(cats);
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-28 pt-32 lg:px-8">
@@ -43,7 +49,12 @@ export default async function MenuPage({
       </Reveal>
 
       <div className="mt-12">
-        <MenuGrid items={items} categories={CATEGORIES} initialGroup={parseGroup(servicio)} />
+        <MenuGrid
+          items={items}
+          categories={names}
+          groupMap={groupMap}
+          initialGroup={parseGroup(servicio)}
+        />
       </div>
     </div>
   );

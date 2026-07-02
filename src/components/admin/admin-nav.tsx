@@ -8,6 +8,7 @@ import {
   CalendarDays,
   BarChart3,
   Users,
+  Tags,
 } from "lucide-react";
 
 const LINKS = [
@@ -16,13 +17,14 @@ const LINKS = [
   { href: "/admin/estadisticas", label: "Estadísticas", icon: BarChart3 },
   { href: "/admin/clientes", label: "Clientes", icon: Users },
   { href: "/admin/menu", label: "Menú", icon: UtensilsCrossed },
+  { href: "/admin/categorias", label: "Categorías", icon: Tags },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-1.5">
+    <nav className="flex flex-wrap items-center gap-1.5">
       {LINKS.map(({ href, label, icon: Icon }) => {
         const active = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
         return (
