@@ -109,18 +109,40 @@ export const MENU_ITEMS: MenuItem[] = [
   // ---------------------------- EMPANADAS ----------------------------
   {
     id: "emp-saltenas",
-    slug: "empanadas-saltenas",
-    name: "Empanadas (docena)",
+    slug: "empanadas-de-carne",
+    name: "Empanadas de carne (docena)",
     description:
-      "Carne cortada a cuchillo (salteñas), caprese, verdura y humita. Congeladas o horneadas a elección. Mínimo 1 docena.",
+      "Carne cortada a cuchillo, estilo salteña. Congeladas o horneadas a elección. Mínimo 1 docena.",
     priceInCents: 2_600_000,
     currency: "ARS",
-    images: [img("empanadas-saltenas", "Empanadas salteñas cortadas a cuchillo")],
+    images: [img("empanadas-saltenas", "Empanadas de carne cortadas a cuchillo")],
     available: true,
     maxQuantity: 30,
     category: "Empanadas",
     type: "dish",
     metadata: { unit: "docena", estado: "Congeladas o horneadas a elección" },
+  },
+  {
+    id: "empanadas-caprese-verdura",
+    slug: "empanadas-caprese-verdura",
+    name: "Empanadas caprese y verdura (docena)",
+    description:
+      "Elegí tu sabor: caprese o verdura. Congeladas o horneadas a elección. Mínimo 1 docena.",
+    priceInCents: 2_600_000,
+    currency: "ARS",
+    images: [img("empanadas-saltenas", "Empanadas caprese y verdura")],
+    available: true,
+    maxQuantity: 30,
+    category: "Empanadas",
+    type: "dish",
+    metadata: {
+      unit: "docena",
+      estado: "Congeladas o horneadas a elección",
+      variants: JSON.stringify([
+        { label: "Caprese", priceInCents: 2_600_000 },
+        { label: "Verdura", priceInCents: 2_600_000 },
+      ]),
+    },
   },
   {
     id: "emp-canastitas",
