@@ -384,8 +384,8 @@ export const MENU_ITEMS: MenuItem[] = [
     slug: "menu-encuentro",
     name: 'Menú "Encuentro"',
     description:
-      "Recepción de mesa de campo (fiambres, quesos, dips, panes y tostaditas). 2 por persona: empanadas salteñas, canastitas de verdura y canastitas caprese.",
-    priceInCents: 2_300_000,
+      "Recepción de mesa de campo (fiambres, quesos, dips, panes y tostaditas). Dos empanadas a elección por persona (carne, verdura y/o caprese).",
+    priceInCents: 2_100_000,
     currency: "ARS",
     images: [img("menu-encuentro", "Menú Encuentro")],
     available: true,
@@ -396,7 +396,7 @@ export const MENU_ITEMS: MenuItem[] = [
     includes: [
       "Recepción: mesa de campo completa",
       "Panes, tostaditas, grisines y batatitas fritas",
-      "2 por persona: empanadas salteñas + canastitas de verdura y caprese",
+      "Dos empanadas a elección por persona (carne, verdura y/o caprese)",
     ],
     metadata: {
       unit: "persona",
