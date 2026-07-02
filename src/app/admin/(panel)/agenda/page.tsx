@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice, formatUnit } from "@/lib/utils";
-import { STATUS_META, statusOf, waHref, isActive } from "@/lib/admin/orders";
+import { STATUS_META, statusOf, waHref } from "@/lib/admin/orders";
 import { CalendarDays, Phone, ChefHat } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -44,8 +44,11 @@ export default async function AgendaPage() {
     .order("delivery_date", { ascending: true });
 
   const today = todayStr();
+  // Solo pendientes de preparar: nuevo o confirmado (entregado/cancelado se ocultan).
+  const isPending = (o: OrderRecord) =>
+    statusOf(o.status) === "nuevo" || statusOf(o.status) === "confirmado";
   const orders = ((data ?? []) as OrderRecord[]).filter(
-    (o) => isActive(o) && o.delivery_date && o.delivery_date >= today
+    (o) => isPending(o) && o.delivery_date && o.delivery_date >= today
   );
 
   // Agrupar por fecha de entrega.
