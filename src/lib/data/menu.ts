@@ -51,6 +51,7 @@ function rowToMenuItem(r: MenuRow): MenuItem {
 /** Trae todos los ítems (DB o mock). Una sola query; el resto filtra en JS. */
 async function fetchAllItems(): Promise<MenuItem[]> {
   const supabase = createPublicClient();
+  // Sin config → mock. (Sitio funciona sin DB.)
   if (!supabase) return MENU_ITEMS;
 
   const { data, error } = await supabase
@@ -58,7 +59,15 @@ async function fetchAllItems(): Promise<MenuItem[]> {
     .select("*")
     .order("sort_order", { ascending: true });
 
-  if (error || !data || data.length === 0) return MENU_ITEMS;
+  // Error de lectura con DB configurada: NO caer al mock. El mock contradice
+  // las ediciones del admin (p.ej. un ítem marcado disponible vuelve a "no
+  // disponible" en cada regeneración ISR que falla). Lanzamos para que ISR
+  // conserve la última página buena en vez de cachear datos mock erróneos.
+  if (error) throw new Error(`No se pudo leer menu_items: ${error.message}`);
+
+  // DB configurada pero vacía (aún sin seed) → mock como catálogo inicial.
+  if (!data || data.length === 0) return MENU_ITEMS;
+
   return (data as MenuRow[]).map(rowToMenuItem);
 }
 
