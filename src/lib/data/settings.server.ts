@@ -1,10 +1,11 @@
-import { unstable_cache } from "next/cache";
 import { createPublicClient } from "@/lib/supabase/public";
 import { DEFAULT_SETTINGS, type BusinessSettings } from "@/lib/data/settings";
 
 // =====================================================================
 // Lectura de la configuración del negocio desde Supabase (solo servidor).
-// Cacheada con tag "settings"; el guardado en el panel invalida el tag.
+// Sin capa de caché propia (igual que menu.ts / categories.ts): se apoya en
+// el revalidate/ISR de cada página + el revalidatePath("/", "layout") que
+// dispara el guardado en el panel, así el cambio se ve al instante.
 // Si la tabla no existe o está vacía, devuelve DEFAULT_SETTINGS (el sitio
 // funciona igual sin haber corrido la migración 0002).
 // =====================================================================
@@ -20,7 +21,7 @@ interface SettingsRow {
   min_order_in_cents: number | null;
 }
 
-async function fetchSettings(): Promise<BusinessSettings> {
+export async function getSettings(): Promise<BusinessSettings> {
   const supabase = createPublicClient();
   if (!supabase) return DEFAULT_SETTINGS;
 
@@ -40,8 +41,3 @@ async function fetchSettings(): Promise<BusinessSettings> {
     minOrderInCents: r.min_order_in_cents ?? d.minOrderInCents,
   };
 }
-
-export const getSettings = unstable_cache(fetchSettings, ["business-settings"], {
-  revalidate: 120,
-  tags: ["settings"],
-});

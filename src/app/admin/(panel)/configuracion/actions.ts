@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export interface SettingsFormState {
@@ -38,8 +38,9 @@ export async function saveSettings(
   const { error } = await supabase.from("settings").upsert(row);
   if (error) return { ok: false, error: error.message };
 
-  updateTag("settings");
-  // Refresca el layout del storefront (footer, envío, mínimo, WhatsApp).
+  // Refresca el layout del storefront (footer, envío, mínimo, WhatsApp) y el
+  // propio panel de configuración.
   revalidatePath("/", "layout");
+  revalidatePath("/admin/configuracion");
   return { ok: true };
 }
