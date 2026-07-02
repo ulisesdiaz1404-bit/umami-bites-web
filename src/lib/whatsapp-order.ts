@@ -41,11 +41,15 @@ function formatDate(iso?: string): string | null {
   });
 }
 
+// Separador de sección — carácter de línea (no emoji), se ve igual en todos
+// los teléfonos sin depender de la fuente de emojis del sistema.
+const SEP = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+
 /** Arma el texto del pedido (formato WhatsApp con *negritas*). */
 export function buildOrderMessage(o: OrderPayload): string {
   const lines: string[] = [
     "🍽️ *Nuevo pedido — Umami Bites*",
-    "",
+    SEP,
     `👤 *Cliente:* ${o.customer.name}`,
     `📞 *Teléfono:* ${o.customer.phone}`,
     `📍 *Dirección:* ${o.customer.address}`,
@@ -55,7 +59,7 @@ export function buildOrderMessage(o: OrderPayload): string {
   if (date) lines.push(`📅 *Entrega:* ${date}`);
   if (o.customer.notes?.trim()) lines.push(`📝 *Notas:* ${o.customer.notes.trim()}`);
 
-  lines.push("", "🛒 *Pedido:*");
+  lines.push(SEP, "🛒 *Pedido:*");
   for (const item of o.items) {
     lines.push(
       `• ${item.quantity} ${formatUnit(item.quantity, item.unit)} — ${item.name} — ${formatPrice(
@@ -66,11 +70,11 @@ export function buildOrderMessage(o: OrderPayload): string {
   }
 
   lines.push(
-    "",
-    `Subtotal: ${formatPrice(o.subtotalInCents, "ARS")}`,
-    `Envío: ${formatPrice(o.shippingInCents, "ARS")}`,
-    `*Total: ${formatPrice(o.totalInCents, "ARS")}*`,
-    "",
+    SEP,
+    `🧾 Subtotal: ${formatPrice(o.subtotalInCents, "ARS")}`,
+    `🚚 Envío: ${formatPrice(o.shippingInCents, "ARS")}`,
+    `💵 *Total: ${formatPrice(o.totalInCents, "ARS")}*`,
+    SEP,
     `💳 *Pago:* ${PAYMENT_LABELS[o.payment]}`
   );
 
