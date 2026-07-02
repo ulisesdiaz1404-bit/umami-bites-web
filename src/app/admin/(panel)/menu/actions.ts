@@ -80,13 +80,15 @@ export async function saveMenuItem(
   const costRaw = String(formData.get("cost") ?? "").trim();
   const costCents = costRaw ? Math.max(0, Math.round(Number(costRaw) * 100)) : 0;
   let metadata: Record<string, string> | null = null;
+  let previousSlug: string | null = null;
   if (id) {
     const { data: existing } = await supabase
       .from("menu_items")
-      .select("metadata")
+      .select("metadata, slug")
       .eq("id", id)
       .single();
     metadata = (existing?.metadata as Record<string, string> | null) ?? null;
+    previousSlug = existing?.slug ?? null;
   }
   if (costCents > 0) {
     metadata = { ...(metadata ?? {}), cost: String(costCents) };
@@ -128,6 +130,10 @@ export async function saveMenuItem(
   revalidatePath("/admin/menu");
   revalidatePath("/menu");
   revalidatePath("/");
+  // Revalida la página de detalle del ítem (y la del slug viejo si cambió),
+  // así un rename no deja un 404 cacheado hasta que expire el ISR solo.
+  revalidatePath(`/menu/${slug}`);
+  if (previousSlug && previousSlug !== slug) revalidatePath(`/menu/${previousSlug}`);
   return { ok: true };
 }
 
@@ -136,12 +142,19 @@ export async function setAvailability(id: string, available: boolean): Promise<M
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { ok: false, error: "Supabase no está configurado." };
 
+  const { data: existing } = await supabase
+    .from("menu_items")
+    .select("slug")
+    .eq("id", id)
+    .single();
+
   const { error } = await supabase.from("menu_items").update({ available }).eq("id", id);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/menu");
   revalidatePath("/menu");
   revalidatePath("/");
+  if (existing?.slug) revalidatePath(`/menu/${existing.slug}`);
   return { ok: true };
 }
 
