@@ -16,12 +16,17 @@ import {
   MapPin,
   Clock,
   StickyNote,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice, formatUnit } from "@/lib/utils";
 import { PAYMENT_LABELS } from "@/lib/whatsapp-order";
-import { updateOrderStatus } from "@/app/admin/(panel)/actions";
+import {
+  updateOrderStatus,
+  deleteOrder,
+  deleteDeliveredOrders,
+} from "@/app/admin/(panel)/actions";
 import {
   STATUS_META as STATUS,
   statusOf,
@@ -144,7 +149,8 @@ export function OrdersDashboard({
         />
       </div>
 
-      {/* Filtros por estado */}
+      {/* Filtros por estado + limpieza de entregados */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex flex-wrap gap-2">
         {(["todos", "nuevo", "confirmado", "entregado", "cancelado"] as Filter[]).map((f) => {
           const isActive = filter === f;
@@ -165,6 +171,8 @@ export function OrdersDashboard({
             </button>
           );
         })}
+      </div>
+        {metrics.entregados > 0 && <BulkDeleteDelivered count={metrics.entregados} />}
       </div>
 
       {filtered.length === 0 ? (
@@ -342,9 +350,51 @@ function OrderCard({ order }: { order: OrderRecord }) {
               <CheckCircle2 className="size-4" /> Pedido entregado
             </span>
           )}
+
+          {(status === "entregado" || status === "cancelado") && (
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm("¿Borrar este pedido para siempre? No se puede deshacer.")) {
+                  setError(null);
+                  startTransition(async () => {
+                    const res = await deleteOrder(order.id);
+                    if (!res.ok) setError(res.error ?? "No se pudo borrar.");
+                    else router.refresh();
+                  });
+                }
+              }}
+              disabled={pending}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium text-muted transition-colors hover:bg-danger/10 hover:text-danger disabled:opacity-50"
+            >
+              <Trash2 className="size-4" /> Borrar
+            </button>
+          )}
         </div>
       </div>
     </article>
+  );
+}
+
+function BulkDeleteDelivered({ count }: { count: number }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (confirm(`¿Borrar los ${count} pedidos entregados para siempre? No se puede deshacer.`)) {
+          startTransition(async () => {
+            await deleteDeliveredOrders();
+            router.refresh();
+          });
+        }
+      }}
+      disabled={pending}
+      className="inline-flex items-center gap-1.5 rounded-full border border-[#c0563f]/40 px-3.5 py-1.5 text-xs font-medium text-[#a83422] transition-colors hover:bg-[#c0563f]/10 disabled:opacity-50"
+    >
+      <Trash2 className="size-3.5" /> {pending ? "Borrando…" : `Borrar entregados (${count})`}
+    </button>
   );
 }
 
