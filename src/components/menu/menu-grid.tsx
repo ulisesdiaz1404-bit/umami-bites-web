@@ -16,6 +16,7 @@ const GROUP_TABS: { value: GroupFilter; label: string }[] = [
   { value: "all", label: "Todos" },
   { value: "Picadas y complementos", label: "Picadas y complementos" },
   { value: "Menús", label: "Menús" },
+  { value: "Bebidas", label: "Bebidas" },
 ];
 
 interface MenuGridProps {

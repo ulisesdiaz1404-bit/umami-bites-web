@@ -35,13 +35,14 @@ export const CATEGORIES = [
 // El grupo se DERIVA de la categoría (no se guarda en DB), así el filtro
 // "Picadas y complementos / Menús" sale solo del campo `category`.
 // =====================================================================
-export const SERVICE_GROUPS = ["Picadas y complementos", "Menús"] as const;
+export const SERVICE_GROUPS = ["Picadas y complementos", "Menús", "Bebidas"] as const;
 export type ServiceGroup = (typeof SERVICE_GROUPS)[number];
 
 const MENU_CATEGORIES = new Set(["Menús", "Brunch"]);
 
 /** Devuelve a qué servicio pertenece una categoría. */
 export function serviceGroupOf(category: string): ServiceGroup {
+  if (category === "Bebidas") return "Bebidas";
   return MENU_CATEGORIES.has(category) ? "Menús" : "Picadas y complementos";
 }
 

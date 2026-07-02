@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 function parseGroup(value?: string): GroupFilter {
   if (value === "complementos") return "Picadas y complementos";
   if (value === "menus") return "Menús";
+  if (value === "bebidas") return "Bebidas";
   return "all";
 }
 
