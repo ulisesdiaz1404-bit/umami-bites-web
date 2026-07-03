@@ -3,19 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BellRing, X } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { formatPrice } from "@/lib/utils";
 
 // =====================================================================
-// Aviso EN VIVO de pedido nuevo dentro del panel (Supabase Realtime).
-// Se suscribe a los INSERT de la tabla `orders`; cuando entra uno:
+// Aviso de pedido nuevo dentro del panel, por SONDEO (polling).
+// Cada POLL_MS consulta /api/admin/pulse (el pedido más reciente). Si
+// aparece uno más nuevo que el último visto:
 //   1. suena un beep corto (WebAudio, sin archivo de audio),
 //   2. muestra un cartelito arriba a la derecha,
 //   3. refresca la data del panel (router.refresh).
-// Solo funciona con la pestaña del panel abierta; para avisos con el
-// panel cerrado está el email (ver src/lib/notify/order-email.ts).
-// Requiere haber corrido la migración 0003 (Realtime en orders).
+// Se eligió sondeo en vez de Realtime por ser 100% confiable con RLS +
+// las API keys nuevas de Supabase (Realtime quedaba mudo). Para avisos
+// con el panel cerrado está el email (src/lib/notify/order-email.ts).
 // =====================================================================
+
+const POLL_MS = 15_000;
 
 interface Toast {
   id: string;
@@ -23,85 +25,127 @@ interface Toast {
   total: number;
 }
 
-function beep() {
-  try {
+interface Latest {
+  id: string;
+  customer_name: string | null;
+  total_in_cents: number | null;
+  created_at: string;
+}
+
+// AudioContext compartido: los navegadores lo crean "suspendido" y solo suena
+// tras un gesto del usuario (clic/tecla). Por eso se reusa uno solo y se
+// "despierta" (resume) en la primera interacción y antes de cada beep.
+let sharedCtx: AudioContext | null = null;
+
+function getAudioCtx(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  if (!sharedCtx) {
     const Ctx =
       window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext })
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
         .webkitAudioContext;
-    const ctx = new Ctx();
+    if (!Ctx) return null;
+    try {
+      sharedCtx = new Ctx();
+    } catch {
+      return null;
+    }
+  }
+  return sharedCtx;
+}
+
+/** Desbloquea el audio (llamar desde un gesto del usuario). */
+function unlockAudio() {
+  const ctx = getAudioCtx();
+  if (ctx && ctx.state === "suspended") void ctx.resume();
+}
+
+function beep() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === "suspended") void ctx.resume();
+  const now = ctx.currentTime;
+  // Doble campana (880 Hz → 1174 Hz), bien audible.
+  [
+    { freq: 880, at: 0 },
+    { freq: 1174, at: 0.18 },
+  ].forEach(({ freq, at }) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+    osc.frequency.value = freq;
+    const t = now + at;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.17);
     osc.connect(gain).connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.55);
-    osc.onended = () => ctx.close();
-  } catch {
-    // navegador sin WebAudio o política de autoplay: ignorar
-  }
+    osc.start(t);
+    osc.stop(t + 0.2);
+  });
 }
 
 export function NewOrderNotifier() {
   const router = useRouter();
   const [toasts, setToasts] = useState<Toast[]>([]);
-  // Evita reproducir el beep en el primer render/reconexión inicial.
-  const readyRef = useRef(false);
+  // created_at del último pedido ya visto (baseline). Null hasta la 1ª lectura.
+  const lastSeenRef = useRef<string | null>(null);
+
+  // Desbloquea el sonido con la primera interacción del dueño en el panel.
+  useEffect(() => {
+    const unlock = () => unlockAudio();
+    window.addEventListener("pointerdown", unlock);
+    window.addEventListener("keydown", unlock);
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-    let cancelled = false;
+    let stopped = false;
 
-    async function start() {
-      // La tabla `orders` tiene RLS (solo autenticados leen). Realtime aplica
-      // esa RLS sobre el socket, así que hay que pasarle el token del dueño
-      // logueado; sin esto el canal se suscribe pero nunca recibe filas.
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.access_token) {
-        await supabase.realtime.setAuth(session.access_token);
+    async function poll() {
+      try {
+        const res = await fetch("/api/admin/pulse", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as { ok: boolean; latest: Latest | null };
+        const latest = json.latest;
+        if (!latest) return;
+
+        // Primera lectura: fijar baseline sin avisar (no reproducir beep de
+        // pedidos que ya estaban antes de abrir el panel).
+        if (lastSeenRef.current === null) {
+          lastSeenRef.current = latest.created_at;
+          return;
+        }
+
+        // Llegó uno más nuevo que el baseline → avisar.
+        if (latest.created_at > lastSeenRef.current) {
+          lastSeenRef.current = latest.created_at;
+          beep();
+          setToasts((prev) => [
+            {
+              id: latest.id,
+              name: latest.customer_name ?? "Cliente",
+              total: latest.total_in_cents ?? 0,
+            },
+            ...prev,
+          ]);
+          router.refresh();
+        }
+      } catch {
+        // sin red / error puntual: se reintenta en el próximo ciclo
       }
-      if (cancelled) return;
-
-      channel = supabase
-        .channel("orders-nuevos")
-        .on(
-          "postgres_changes",
-          { event: "INSERT", schema: "public", table: "orders" },
-          (payload) => {
-            const row = payload.new as {
-              id: string;
-              customer_name?: string;
-              total_in_cents?: number;
-            };
-            beep();
-            setToasts((prev) => [
-              {
-                id: row.id,
-                name: row.customer_name ?? "Cliente",
-                total: row.total_in_cents ?? 0,
-              },
-              ...prev,
-            ]);
-            router.refresh();
-          }
-        )
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") readyRef.current = true;
-        });
     }
 
-    void start();
+    void poll(); // baseline inmediato
+    const timer = setInterval(() => {
+      if (!stopped) void poll();
+    }, POLL_MS);
 
     return () => {
-      cancelled = true;
-      if (channel) void supabase.removeChannel(channel);
+      stopped = true;
+      clearInterval(timer);
     };
   }, [router]);
 
