@@ -21,6 +21,7 @@ interface MenuItemRow {
   servings: number | null;
   includes: string[] | null;
   images: { url: string; alt: string }[] | null;
+  metadata: Record<string, string> | null;
 }
 
 function rowToItem(r: MenuItemRow): MenuItem {
@@ -38,6 +39,7 @@ function rowToItem(r: MenuItemRow): MenuItem {
     type: r.type,
     servings: r.servings ?? undefined,
     includes: r.includes ?? undefined,
+    metadata: r.metadata ?? undefined,
   };
 }
 

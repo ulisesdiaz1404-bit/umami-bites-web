@@ -32,6 +32,7 @@ import {
   statusOf,
   waHref,
   fmtDateTime,
+  baseMenuItemId,
   type OrderStatus,
 } from "@/lib/admin/orders";
 
@@ -51,7 +52,12 @@ export function OrdersDashboard({
     const revenue = active.reduce((s, o) => s + o.total_in_cents, 0);
     // Costo de mercadería: suma del costo actual de cada ítem × cantidad.
     const cost = active.reduce(
-      (s, o) => s + o.items.reduce((si, it) => si + (costMap[it.menuItemId] ?? 0) * it.quantity, 0),
+      (s, o) =>
+        s +
+        o.items.reduce(
+          (si, it) => si + (costMap[baseMenuItemId(it.menuItemId)] ?? 0) * it.quantity,
+          0
+        ),
       0
     );
     const hasCosts = Object.keys(costMap).length > 0;

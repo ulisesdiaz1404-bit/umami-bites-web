@@ -50,3 +50,13 @@ export function fmtDateTime(iso: string): string {
 export function isActive(o: OrderRecord): boolean {
   return statusOf(o.status) !== "cancelado";
 }
+
+/**
+ * Los ítems con variantes (sabor/tamaño) guardan el pedido con
+ * `${itemId}__${variantIdx}` (ver purchase-panel.tsx). El costo vive en
+ * metadata.cost del ítem BASE, así que hay que pelar el sufijo antes de
+ * buscarlo en el mapa de costos.
+ */
+export function baseMenuItemId(menuItemId: string): string {
+  return menuItemId.split("__")[0] ?? menuItemId;
+}
