@@ -54,35 +54,54 @@ export function NewOrderNotifier() {
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
-    const channel = supabase
-      .channel("orders-nuevos")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "orders" },
-        (payload) => {
-          const row = payload.new as {
-            id: string;
-            customer_name?: string;
-            total_in_cents?: number;
-          };
-          beep();
-          setToasts((prev) => [
-            {
-              id: row.id,
-              name: row.customer_name ?? "Cliente",
-              total: row.total_in_cents ?? 0,
-            },
-            ...prev,
-          ]);
-          router.refresh();
-        }
-      )
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") readyRef.current = true;
-      });
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+
+    async function start() {
+      // La tabla `orders` tiene RLS (solo autenticados leen). Realtime aplica
+      // esa RLS sobre el socket, así que hay que pasarle el token del dueño
+      // logueado; sin esto el canal se suscribe pero nunca recibe filas.
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        await supabase.realtime.setAuth(session.access_token);
+      }
+      if (cancelled) return;
+
+      channel = supabase
+        .channel("orders-nuevos")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "orders" },
+          (payload) => {
+            const row = payload.new as {
+              id: string;
+              customer_name?: string;
+              total_in_cents?: number;
+            };
+            beep();
+            setToasts((prev) => [
+              {
+                id: row.id,
+                name: row.customer_name ?? "Cliente",
+                total: row.total_in_cents ?? 0,
+              },
+              ...prev,
+            ]);
+            router.refresh();
+          }
+        )
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") readyRef.current = true;
+        });
+    }
+
+    void start();
 
     return () => {
-      void supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) void supabase.removeChannel(channel);
     };
   }, [router]);
 
