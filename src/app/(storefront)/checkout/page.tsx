@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Banknote, CreditCard, Smartphone, MessageCircle } from "lucide-react";
+import { track } from "@vercel/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -116,6 +117,13 @@ export default function CheckoutPage() {
       shippingInCents,
       totalInCents,
     };
+
+    // Evento de conversión: pedido confirmado que se envía por WhatsApp.
+    track("order_confirm", {
+      payment,
+      items: items.length,
+      totalArs: Math.round(totalInCents / 100),
+    });
 
     const href = buildOrderWhatsappHref(settings.ordersWhatsapp, payload);
 

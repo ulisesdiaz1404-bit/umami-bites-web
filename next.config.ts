@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -18,7 +19,8 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   // Supabase: auth/REST (https) + realtime (wss) desde el navegador.
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co" +
+  // Sentry: envío de errores/trazas al ingest (solo si se activa con DSN).
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.sentry.io" +
     (isDev ? " ws: http://localhost:*" : ""),
   "media-src 'self'",
   "object-src 'none'",
@@ -77,4 +79,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry solo se "engancha" al build si hay DSN configurado. Sin DSN, se
+// exporta la config tal cual (build idéntico al de siempre, riesgo cero).
+const enableSentry = Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN);
+
+export default enableSentry
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: !process.env.CI,
+      // Amplía la subida de source maps del cliente para mejores stack traces.
+      widenClientFileUpload: true,
+      // Saca logs del SDK del bundle del cliente.
+      disableLogger: true,
+      // Solo sube source maps si hay auth token (si no, buildea sin subirlos).
+      sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+    })
+  : nextConfig;

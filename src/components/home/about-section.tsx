@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Instagram, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
+import { WaCta } from "@/components/analytics/wa-cta";
 import { CONTACT } from "@/lib/contact";
 import { whatsappHref } from "@/lib/data/settings";
 import { getSettings } from "@/lib/data/settings.server";
@@ -48,11 +49,9 @@ export async function AboutSection() {
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Button asChild size="lg">
-              <Link href={waHref} target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="size-4" /> Cotizá tu evento
-              </Link>
-            </Button>
+            <WaCta href={waHref} location="about" size="lg">
+              <MessageCircle className="size-4" /> Cotizá tu evento
+            </WaCta>
             <Button asChild size="lg" variant="outline">
               <Link href={CONTACT.instagramUrl} target="_blank" rel="noopener noreferrer">
                 <Instagram className="size-4" /> {CONTACT.instagram}

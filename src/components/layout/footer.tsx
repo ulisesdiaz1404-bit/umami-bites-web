@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Instagram, Phone, MapPin, Clock } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
-import { Button } from "@/components/ui/button";
+import { WaCta } from "@/components/analytics/wa-cta";
 import { CONTACT } from "@/lib/contact";
 import { DEFAULT_SETTINGS, whatsappHref, type BusinessSettings } from "@/lib/data/settings";
 
@@ -20,11 +20,9 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
               Sabor profundo y presentación impecable. Llevamos nuestro servicio de catering a
               domicilio, salones, quintas y oficinas. Una buena picada inicia un gran encuentro.
             </p>
-            <Button asChild variant="outline" size="sm">
-              <a href={waHref} target="_blank" rel="noopener noreferrer">
-                Cotizá tu evento
-              </a>
-            </Button>
+            <WaCta href={waHref} location="footer" variant="outline" size="sm">
+              Cotizá tu evento
+            </WaCta>
 
             {(settings.address || settings.hours) && (
               <ul className="space-y-2 pt-1 text-sm text-muted">
@@ -76,14 +74,14 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
             >
               <Instagram className="size-4 text-accent" /> {CONTACT.instagram}
             </a>
-            <a
+            <WaCta
               href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
+              location="footer-phone"
+              plain
               className="inline-flex items-center gap-2 transition-colors hover:text-cream"
             >
               <Phone className="size-4 text-accent" /> {settings.phonePrimary}
-            </a>
+            </WaCta>
           </div>
         </div>
       </div>

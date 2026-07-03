@@ -1,7 +1,12 @@
+# Build scripts de dependencias. false = no se compila en install.
+#  - @sentry/cli: solo para subir source maps (opcional/gated, ver SENTRY.md).
+#  - ffmpeg-static: su install.js se corre manual para `pnpm gen:hero`.
+#  - sharp / unrs-resolver: usan binarios prebuilt, no hace falta compilar.
 allowBuilds:
-  ffmpeg-static: set this to true or false
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
+  '@sentry/cli': false
+  ffmpeg-static: false
+  sharp: false
+  unrs-resolver: false
 
 # Fuerza postcss parcheado (GHSA-qx2v-qp2m-jg93: XSS en </style>).
 # next@16 trae postcss@8.4.31 de forma transitiva; lo subimos a >=8.5.10.
