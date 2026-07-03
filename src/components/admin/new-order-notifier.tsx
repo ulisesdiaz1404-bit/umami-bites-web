@@ -11,7 +11,9 @@ import { formatPrice } from "@/lib/utils";
 // aparece uno más nuevo que el último visto:
 //   1. suena un beep corto (WebAudio, sin archivo de audio),
 //   2. muestra un cartelito arriba a la derecha,
-//   3. refresca la data del panel (router.refresh).
+//   3. si el dueño está en OTRA pestaña/página → lanza además una
+//      notificación del sistema (esquina de la pantalla, con permiso),
+//   4. refresca la data del panel (router.refresh).
 // Se eligió sondeo en vez de Realtime por ser 100% confiable con RLS +
 // las API keys nuevas de Supabase (Realtime quedaba mudo). Para avisos
 // con el panel cerrado está el email (src/lib/notify/order-email.ts).
@@ -60,6 +62,39 @@ function unlockAudio() {
   if (ctx && ctx.state === "suspended") void ctx.resume();
 }
 
+/** Pide permiso para notificaciones del sistema (desde un gesto del usuario). */
+function requestNotifPermission() {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission === "default") {
+    void Notification.requestPermission();
+  }
+}
+
+/**
+ * Notificación del sistema operativo (aparece aunque el navegador esté en
+ * otra pestaña/página). Solo si el dueño dio permiso. Al tocarla, enfoca
+ * la ventana del panel.
+ */
+function showSystemNotification(name: string, total: number) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try {
+    const n = new Notification("🍽️ ¡Nuevo pedido! — Umami", {
+      body: `${name} · ${formatPrice(total, "ARS")}`,
+      icon: "/icon.png",
+      badge: "/icon.png",
+      tag: "umami-nuevo-pedido", // reemplaza la anterior en vez de apilar
+      renotify: true,
+    } as NotificationOptions);
+    n.onclick = () => {
+      window.focus();
+      n.close();
+    };
+  } catch {
+    // algunos navegadores móviles no permiten Notification directa: ignorar
+  }
+}
+
 function beep() {
   const ctx = getAudioCtx();
   if (!ctx) return;
@@ -90,14 +125,18 @@ export function NewOrderNotifier() {
   // created_at del último pedido ya visto (baseline). Null hasta la 1ª lectura.
   const lastSeenRef = useRef<string | null>(null);
 
-  // Desbloquea el sonido con la primera interacción del dueño en el panel.
+  // Con la primera interacción del dueño: desbloquea el sonido y pide permiso
+  // de notificaciones (ambas cosas requieren un gesto del usuario).
   useEffect(() => {
-    const unlock = () => unlockAudio();
-    window.addEventListener("pointerdown", unlock);
-    window.addEventListener("keydown", unlock);
+    const onGesture = () => {
+      unlockAudio();
+      requestNotifPermission();
+    };
+    window.addEventListener("pointerdown", onGesture);
+    window.addEventListener("keydown", onGesture);
     return () => {
-      window.removeEventListener("pointerdown", unlock);
-      window.removeEventListener("keydown", unlock);
+      window.removeEventListener("pointerdown", onGesture);
+      window.removeEventListener("keydown", onGesture);
     };
   }, []);
 
@@ -122,15 +161,13 @@ export function NewOrderNotifier() {
         // Llegó uno más nuevo que el baseline → avisar.
         if (latest.created_at > lastSeenRef.current) {
           lastSeenRef.current = latest.created_at;
+          const name = latest.customer_name ?? "Cliente";
+          const total = latest.total_in_cents ?? 0;
           beep();
-          setToasts((prev) => [
-            {
-              id: latest.id,
-              name: latest.customer_name ?? "Cliente",
-              total: latest.total_in_cents ?? 0,
-            },
-            ...prev,
-          ]);
+          setToasts((prev) => [{ id: latest.id, name, total }, ...prev]);
+          // Si el dueño está mirando otra pestaña/página, avisarle con una
+          // notificación del sistema (el cartelito no se vería).
+          if (document.hidden) showSystemNotification(name, total);
           router.refresh();
         }
       } catch {
