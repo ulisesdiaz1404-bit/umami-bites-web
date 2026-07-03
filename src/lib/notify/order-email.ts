@@ -145,11 +145,15 @@ function renderHtml(o: OrderEmailData): string {
  * Devuelve true si se envió, false si no había config o falló.
  */
 export async function sendNewOrderEmail(o: OrderEmailData): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.ORDER_NOTIFY_EMAIL;
+  // clean(): saca BOM (U+FEFF) y espacios que a veces se cuelan al cargar las
+  // env vars (romperían el header Authorization con un ByteString inválido).
+  const clean = (s?: string) =>
+    s ? s.replace(/[﻿​\r\n]/g, "").trim() : s;
+  const apiKey = clean(process.env.RESEND_API_KEY);
+  const to = clean(process.env.ORDER_NOTIFY_EMAIL);
   if (!apiKey || !to) return false; // no configurado → no-op silencioso
 
-  const from = process.env.ORDER_NOTIFY_FROM || "Umami Bites <onboarding@resend.dev>";
+  const from = clean(process.env.ORDER_NOTIFY_FROM) || "Umami Bites <onboarding@resend.dev>";
   const total = formatPrice(o.totalInCents, "ARS");
 
   try {
