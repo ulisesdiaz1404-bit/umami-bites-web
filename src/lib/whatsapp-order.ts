@@ -85,3 +85,34 @@ export function buildOrderMessage(o: OrderPayload): string {
 export function buildOrderWhatsappHref(phone: string, o: OrderPayload): string {
   return `https://wa.me/${phone}?text=${encodeURIComponent(buildOrderMessage(o))}`;
 }
+
+// ---------------------------------------------------------------------
+// Pedido de reseña post-entrega. El dueño abre WhatsApp con el mensaje
+// pre-armado hacia el cliente (un clic, no es automático — no hay API
+// paga de WhatsApp Business acá).
+// ---------------------------------------------------------------------
+
+const INSTAGRAM_URL = "https://www.instagram.com/umami.bites.catering/";
+
+/** Mensaje amable pidiendo calificación al cliente tras la entrega. */
+export function buildReviewMessage(customerName?: string): string {
+  const hola = customerName?.trim() ? `¡Hola ${customerName.trim()}! ` : "¡Hola! ";
+  return [
+    `${hola}Somos *Umami Bites* 🍽️`,
+    "",
+    "¡Gracias por tu pedido! Esperamos que hayas disfrutado todo 😃",
+    "",
+    "¿Nos dejarías tu opinión? Nos ayuda un montón a seguir creciendo. Con una o dos líneas contándonos qué te pareció ya nos hacés felices 🙌",
+    "",
+    `Y si querés, seguinos y etiquetanos en Instagram 📸 ${INSTAGRAM_URL}`,
+    "",
+    "¡Gracias totales! 🧡",
+  ].join("\n");
+}
+
+/** Enlace wa.me para pedirle la reseña a un cliente (teléfono en cualquier formato). */
+export function buildReviewHref(phone: string, customerName?: string): string {
+  const digits = phone.replace(/\D/g, "");
+  const full = digits.startsWith("54") ? digits : `54${digits}`;
+  return `https://wa.me/${full}?text=${encodeURIComponent(buildReviewMessage(customerName))}`;
+}

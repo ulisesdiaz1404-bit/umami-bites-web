@@ -17,11 +17,12 @@ import {
   Clock,
   StickyNote,
   Trash2,
+  Star,
   type LucideIcon,
 } from "lucide-react";
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice, formatUnit } from "@/lib/utils";
-import { PAYMENT_LABELS } from "@/lib/whatsapp-order";
+import { PAYMENT_LABELS, buildReviewHref } from "@/lib/whatsapp-order";
 import {
   updateOrderStatus,
   deleteOrder,
@@ -352,9 +353,19 @@ function OrderCard({ order }: { order: OrderRecord }) {
             </ActionBtn>
           )}
           {status === "entregado" && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2f6b3f]">
-              <CheckCircle2 className="size-4" /> Pedido entregado
-            </span>
+            <>
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2f6b3f]">
+                <CheckCircle2 className="size-4" /> Pedido entregado
+              </span>
+              <a
+                href={buildReviewHref(order.customer_phone, order.customer_name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#c9871f]/50 px-4 py-2 text-xs font-semibold text-[#8a5a1e] transition-colors hover:bg-[#c9871f]/10"
+              >
+                <Star className="size-4" /> Pedir reseña
+              </a>
+            </>
           )}
 
           {(status === "entregado" || status === "cancelado") && (

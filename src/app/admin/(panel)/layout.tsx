@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SignOutButton } from "@/components/admin/sign-out-button";
 import { AdminNav } from "@/components/admin/admin-nav";
+import { NewOrderNotifier } from "@/components/admin/new-order-notifier";
 
 export const metadata: Metadata = {
   title: "Panel · Umami Bites",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
 export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-bg">
+      <NewOrderNotifier />
       <header className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
           <div className="flex items-center gap-4">

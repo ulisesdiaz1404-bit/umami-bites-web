@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/admin-client";
+import { sendNewOrderEmail } from "@/lib/notify/order-email";
 
 export const runtime = "nodejs";
 
@@ -92,5 +93,25 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
   }
+
+  // Aviso por email al dueño (no bloquea ni rompe si falla / no está configurado).
+  await sendNewOrderEmail({
+    customerName: String(customer.name),
+    customerPhone: String(customer.phone),
+    address: String(customer.address),
+    notes: customer.notes ? String(customer.notes) : null,
+    deliveryDate: deliveryDate || null,
+    payment,
+    items: (items as any[]).map((it) => ({
+      name: String(it.name),
+      quantity: Number(it.quantity) || 0,
+      unit: it.unit ? String(it.unit) : undefined,
+      priceInCents: Number(it.priceInCents) || 0,
+    })),
+    subtotalInCents: Number(subtotalInCents) || 0,
+    shippingInCents: Number(shippingInCents) || 0,
+    totalInCents: Number(totalInCents) || 0,
+  });
+
   return NextResponse.json({ ok: true, persisted: true });
 }
