@@ -22,11 +22,21 @@ export interface OrderCustomer {
   notes?: string;
 }
 
+export interface OrderDelivery {
+  /** Nombre de la zona o "Retiro en el local". */
+  label: string;
+  /** true = retiro en el local (sin envío). */
+  pickup: boolean;
+  /** true = costo de envío a coordinar (localidad fuera de la lista). */
+  consult: boolean;
+}
+
 export interface OrderPayload {
   items: CartItem[];
   customer: OrderCustomer;
   payment: PaymentMethod;
   deliveryDate?: string;
+  delivery?: OrderDelivery;
   subtotalInCents: number;
   shippingInCents: number;
   totalInCents: number;
@@ -52,11 +62,18 @@ export function buildOrderMessage(o: OrderPayload): string {
     SEP,
     `👤 *Cliente:* ${o.customer.name}`,
     `📞 *Teléfono:* ${o.customer.phone}`,
-    `📍 *Dirección:* ${o.customer.address}`,
   ];
 
+  // Entrega: retiro en el local o envío a domicilio con su zona.
+  if (o.delivery?.pickup) {
+    lines.push("🏬 *Entrega:* Retiro en el local");
+  } else {
+    lines.push(`📍 *Dirección:* ${o.customer.address}`);
+    if (o.delivery?.label) lines.push(`🗺️ *Zona:* ${o.delivery.label}`);
+  }
+
   const date = formatDate(o.deliveryDate);
-  if (date) lines.push(`📅 *Entrega:* ${date}`);
+  if (date) lines.push(`📅 *Fecha:* ${date}`);
   if (o.customer.notes?.trim()) lines.push(`📝 *Notas:* ${o.customer.notes.trim()}`);
 
   lines.push(SEP, "🛒 *Pedido:*");
@@ -69,11 +86,20 @@ export function buildOrderMessage(o: OrderPayload): string {
     );
   }
 
+  // Renglón de envío: retiro (sin cargo), a coordinar, o precio calculado.
+  const shippingLine = o.delivery?.pickup
+    ? "🏬 Retiro: sin cargo"
+    : o.delivery?.consult
+      ? "🚚 Envío: a coordinar según zona"
+      : `🚚 Envío: ${formatPrice(o.shippingInCents, "ARS")}`;
+
   lines.push(
     SEP,
     `🧾 Subtotal: ${formatPrice(o.subtotalInCents, "ARS")}`,
-    `🚚 Envío: ${formatPrice(o.shippingInCents, "ARS")}`,
-    `💵 *Total: ${formatPrice(o.totalInCents, "ARS")}*`,
+    shippingLine,
+    `💵 *Total: ${formatPrice(o.totalInCents, "ARS")}${
+      o.delivery?.consult ? " + envío" : ""
+    }*`,
     SEP,
     `💳 *Pago:* ${PAYMENT_LABELS[o.payment]}`
   );

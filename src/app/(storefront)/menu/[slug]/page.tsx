@@ -8,6 +8,8 @@ import { PurchasePanel } from "@/components/menu/purchase-panel";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { PackageCard } from "@/components/menu/package-card";
 import { Reveal } from "@/components/ui/reveal";
+import { JsonLd } from "@/components/seo/json-ld";
+import { productSchema } from "@/lib/seo/schema";
 import { getAllItems, getItemBySlug, getRelatedItems } from "@/lib/data/menu";
 
 // ISR + slugs nuevos a demanda (ítems agregados desde el admin).
@@ -29,6 +31,7 @@ export async function generateMetadata({
   return {
     title: item.name,
     description: item.description.slice(0, 155),
+    alternates: { canonical: `/menu/${item.slug}` },
     openGraph: { images: item.images.map((i) => i.url) },
   };
 }
@@ -47,6 +50,7 @@ export default async function ItemDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-5 pb-28 pt-28 lg:px-8">
+      <JsonLd data={productSchema(item)} />
       <Link
         href="/menu"
         className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-cream"

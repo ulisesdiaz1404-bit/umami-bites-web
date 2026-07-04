@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CartItem } from "@/lib/types/cart";
+import { ADDRESS_ZONE_ID } from "@/lib/data/delivery-zones";
+
+/** Envío cotizado a partir de la dirección exacta (Nominatim). */
+export interface AddressQuote {
+  label: string;
+  priceInCents: number;
+  km: number;
+}
 
 // =====================================================================
 // Zustand — Carrito. Persistencia en localStorage vía persist middleware.
@@ -19,6 +27,8 @@ interface CartState {
   items: CartItem[];
   isOpen: boolean;
   deliveryDate?: string; // ISO date; obligatorio para continuar al checkout
+  deliveryZoneId?: string; // zona de entrega o retiro (ver delivery-zones.ts)
+  addressQuote?: AddressQuote; // envío calculado por dirección exacta
 
   // acciones
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
@@ -28,6 +38,8 @@ interface CartState {
   decrement: (menuItemId: string) => void;
   clear: () => void;
   setDeliveryDate: (date: string) => void;
+  setDeliveryZone: (zoneId: string) => void;
+  setAddressQuote: (quote: AddressQuote) => void;
 
   // drawer
   openCart: () => void;
@@ -44,6 +56,8 @@ export const useCartStore = create<CartState>()(
       items: [],
       isOpen: false,
       deliveryDate: undefined,
+      deliveryZoneId: undefined,
+      addressQuote: undefined,
 
       addItem: (item, quantity = 1) =>
         set((state) => {
@@ -101,6 +115,11 @@ export const useCartStore = create<CartState>()(
 
       clear: () => set({ items: [] }),
       setDeliveryDate: (date) => set({ deliveryDate: date }),
+      // Elegir una localidad de la lista descarta la cotización por dirección.
+      setDeliveryZone: (zoneId) => set({ deliveryZoneId: zoneId, addressQuote: undefined }),
+      // Cotización por dirección exacta: pasa a ser la zona activa.
+      setAddressQuote: (quote) =>
+        set({ addressQuote: quote, deliveryZoneId: ADDRESS_ZONE_ID }),
 
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),

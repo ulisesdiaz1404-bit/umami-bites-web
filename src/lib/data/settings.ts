@@ -23,7 +23,9 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   phoneSecondary: "(11) 3668-5271",
   address: "",
   hours: "",
-  shippingInCents: 50_000,
+  // Envío base (flat). El costo real sube según la distancia a Bella Vista;
+  // este es el mínimo de referencia. Ajustable desde el panel de configuración.
+  shippingInCents: 150_000,
   minOrderInCents: 8_000_000,
 };
 

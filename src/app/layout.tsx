@@ -3,6 +3,9 @@ import { Playfair_Display, DM_Sans } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
+import { JsonLd } from "@/components/seo/json-ld";
+import { catererSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
   },
   description:
     "Catering premium con envío o retiro: picadas de autor, menús completos (asado, criolla, pizza party, sándwich a la parrilla), brunch, finger food y mesa dulce. Vajilla, mantelería y servicio incluidos.",
-  metadataBase: new URL("https://umamibites.com.ar"),
+  metadataBase: new URL(SITE_URL),
   keywords: [
     "catering a domicilio",
     "picadas",
@@ -49,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" className={`${playfair.variable} ${dmSans.variable}`}>
       <body className="bg-bg text-primary antialiased">
+        <JsonLd data={catererSchema()} />
         <Providers>{children}</Providers>
         <SpeedInsights />
         <Analytics />

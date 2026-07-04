@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Servicios",
   description:
     "Nuestros servicios de catering: picadas y complementos (tablas, empanadas, finger food, mesa dulce, bebidas) y menús completos para eventos (asado, criolla, pizza party, sándwich a la parrilla, brunch).",
+  alternates: { canonical: "/menu" },
 };
 
 function parseGroup(value?: string): GroupFilter {

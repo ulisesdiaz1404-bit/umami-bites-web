@@ -12,6 +12,7 @@ import { CartSummary } from "@/components/cart/cart-summary";
 import { useCart } from "@/hooks/use-cart";
 import { useSettings } from "@/components/settings-context";
 import { formatPrice, formatUnit, cn } from "@/lib/utils";
+import { ALL_DELIVERY_OPTIONS, ADDRESS_ZONE_ID } from "@/lib/data/delivery-zones";
 import {
   buildOrderWhatsappHref,
   type PaymentMethod,
@@ -41,6 +42,11 @@ export default function CheckoutPage() {
     hydrated,
     deliveryDate,
     setDeliveryDate,
+    deliveryZoneId,
+    setDeliveryZone,
+    setAddressQuote,
+    deliveryZone,
+    shippingStatus,
     subtotalInCents,
     shippingInCents,
     totalInCents,
@@ -50,6 +56,7 @@ export default function CheckoutPage() {
     minOrderInCents,
   } = useCart();
   const settings = useSettings();
+  const isPickup = deliveryZone?.kind === "pickup";
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -57,6 +64,43 @@ export default function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [payment, setPayment] = useState<PaymentMethod | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [quoting, setQuoting] = useState(false);
+  const [quoteMsg, setQuoteMsg] = useState<string | null>(null);
+
+  // Calcula el envío a partir de la dirección exacta (Nominatim, vía /api).
+  async function calcByAddress() {
+    if (!address.trim()) {
+      setQuoteMsg("Escribí tu dirección primero.");
+      return;
+    }
+    setQuoting(true);
+    setQuoteMsg(null);
+    try {
+      const res = await fetch("/api/shipping/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: address.trim() }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setAddressQuote({
+          label: `Envío a ${data.label}`,
+          priceInCents: data.priceInCents,
+          km: data.km,
+        });
+      } else if (data.reason === "far") {
+        setQuoteMsg("Esa dirección queda lejos de nuestra zona. Escribinos por WhatsApp para coordinar.");
+      } else if (data.reason === "notfound") {
+        setQuoteMsg("No pudimos ubicar esa dirección. Revisala o elegí tu localidad en la lista.");
+      } else {
+        setQuoteMsg("No pudimos calcular ahora. Elegí tu localidad en la lista de arriba.");
+      }
+    } catch {
+      setQuoteMsg("No pudimos calcular ahora. Elegí tu localidad en la lista de arriba.");
+    } finally {
+      setQuoting(false);
+    }
+  }
 
   if (hydrated && isEmpty) {
     return (
@@ -79,8 +123,16 @@ export default function CheckoutPage() {
     : null;
 
   function handleConfirm() {
-    if (!name.trim() || !phone.trim() || !address.trim()) {
-      setError("Completá nombre, teléfono y dirección para confirmar.");
+    if (!name.trim() || !phone.trim()) {
+      setError("Completá nombre y teléfono para confirmar.");
+      return;
+    }
+    if (shippingStatus === "none") {
+      setError("Elegí la zona de entrega o la opción de retiro.");
+      return;
+    }
+    if (!isPickup && !address.trim()) {
+      setError("Completá la dirección de entrega (o elegí retiro en el local).");
       return;
     }
     if (!deliveryDate) {
@@ -105,14 +157,20 @@ export default function CheckoutPage() {
     const customer = {
       name: name.trim(),
       phone: phone.trim(),
-      address: address.trim(),
+      address: isPickup ? "Retiro en el local" : address.trim(),
       notes,
+    };
+    const delivery = {
+      label: deliveryZone?.label ?? "",
+      pickup: isPickup,
+      consult: shippingStatus === "consult",
     };
     const payload = {
       items,
       customer,
       payment,
       deliveryDate,
+      delivery,
       subtotalInCents,
       shippingInCents,
       totalInCents,
@@ -197,16 +255,66 @@ export default function CheckoutPage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="address">Dirección de entrega *</Label>
-              <Input
-                id="address"
-                name="address"
-                placeholder="Calle, número, localidad"
-                autoComplete="street-address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-              />
+              <Label htmlFor="delivery-zone">Zona de entrega *</Label>
+              <select
+                id="delivery-zone"
+                value={deliveryZoneId ?? ""}
+                onChange={(e) => setDeliveryZone(e.target.value)}
+                className="flex h-12 w-full rounded-base border border-line bg-bg-deep px-4 py-2 text-sm text-cream transition-colors focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 [color-scheme:dark]"
+              >
+                <option value="" disabled>
+                  Elegí tu zona o retiro…
+                </option>
+                {ALL_DELIVERY_OPTIONS.map((z) => (
+                  <option key={z.id} value={z.id}>
+                    {z.kind === "delivery"
+                      ? `${z.label} — ${formatPrice(z.priceInCents, "ARS")}`
+                      : z.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[0.7rem] text-muted">
+                El envío se calcula por distancia desde Bella Vista. El retiro no tiene cargo.
+              </p>
             </div>
+
+            {!isPickup && (
+              <div className="space-y-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="address">Dirección de entrega *</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    placeholder="Calle, número, localidad"
+                    autoComplete="street-address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={calcByAddress}
+                    disabled={quoting}
+                  >
+                    {quoting ? "Calculando…" : "Calcular envío por mi dirección"}
+                  </Button>
+                  {deliveryZoneId === ADDRESS_ZONE_ID && deliveryZone && (
+                    <span className="text-xs text-accent">
+                      ✓ {deliveryZone.label} · ≈{deliveryZone.km} km ·{" "}
+                      {formatPrice(deliveryZone.priceInCents, "ARS")}
+                    </span>
+                  )}
+                </div>
+                {quoteMsg && <p className="text-xs text-danger">{quoteMsg}</p>}
+                <p className="text-[0.7rem] text-muted">
+                  Calculamos por tu dirección, o si preferís elegí tu localidad en la lista de arriba.
+                </p>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="delivery-date">Fecha de entrega *</Label>
               <Input
