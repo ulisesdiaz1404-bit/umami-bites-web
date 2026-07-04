@@ -17,8 +17,9 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
           <div className="space-y-5">
             <Logo mark={64} />
             <p className="max-w-sm text-sm leading-relaxed text-muted">
-              Sabor profundo y presentación impecable. Llevamos nuestro servicio de catering a
-              domicilio, salones, quintas y oficinas. Una buena picada inicia un gran encuentro.
+              Sabor profundo y presentación impecable. Catering para eventos en Buenos Aires y GBA:
+              CABA, Zona Norte (San Isidro, Vicente López, Tigre, Pilar), Zona Oeste (San Miguel,
+              Bella Vista, Morón) y Zona Sur. Casamientos, cumpleaños y eventos corporativos.
             </p>
             <WaCta href={waHref} location="footer" variant="outline" size="sm">
               Cotizá tu evento

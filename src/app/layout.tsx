@@ -25,26 +25,38 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Umami Bites Catering — El sabor profundo, en tu mesa",
+    default: "Catering para Eventos en Buenos Aires | Umami Bites Catering",
     template: "%s · Umami Bites Catering",
   },
   description:
-    "Catering premium con envío o retiro: picadas de autor, menús completos (asado, criolla, pizza party, sándwich a la parrilla), brunch, finger food y mesa dulce. Vajilla, mantelería y servicio incluidos.",
+    "Catering premium a domicilio en Buenos Aires y GBA: casamientos, cumpleaños y eventos corporativos. Picadas de autor, menús completos (asado, criolla, pizza party), brunch, mesa dulce y barra de tragos. Vajilla, mantelería y servicio incluidos.",
   metadataBase: new URL(SITE_URL),
   keywords: [
-    "catering a domicilio",
-    "picadas",
+    "catering para eventos",
+    "catering a domicilio buenos aires",
+    "catering corporativo",
+    "catering para casamientos",
+    "catering para cumpleaños",
+    "picadas para eventos",
+    "catering zona norte",
+    "catering zona oeste",
     "asado al asador",
-    "comida criolla",
     "mesa dulce",
-    "brunch",
-    "eventos",
   ],
   openGraph: {
-    title: "Umami Bites Catering",
-    description: "El sabor profundo, en tu mesa. Catering premium con envío o retiro.",
+    title: "Umami Bites Catering — Catering para eventos en Buenos Aires",
+    description:
+      "Casamientos, cumpleaños y eventos corporativos en CABA y GBA. Picadas de autor, menús completos, mesa dulce y barra de tragos.",
+    url: "/",
+    siteName: "Umami Bites Catering",
     locale: "es_AR",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Umami Bites Catering — Catering para eventos en Buenos Aires",
+    description:
+      "Casamientos, cumpleaños y eventos corporativos en CABA y GBA. Picadas, menús completos, mesa dulce y barra de tragos.",
   },
 };
 

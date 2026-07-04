@@ -8,13 +8,14 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Mejores fotos reales (horizontales, alta calidad) para el slideshow de portada.
+// Cada una con alt propio y descriptivo (mejor accesibilidad + SEO).
 const SLIDES = [
-  "/photos/mesa-dulce-3.jpg",       // mesa dulce (casa de campo)
-  "/photos/carnes-desmechadas-1.jpg", // olla de carne desmechada
-  "/photos/shots-guacamole.jpg",    // shots de guacamole y nachos
-  "/photos/mesa-dulce-2.jpg",       // mesa dulce al sol
-  "/photos/picada-umami-3.jpg",     // picada Umami
-  "/photos/pinchos-cherry.jpg",     // pinchos de tomate cherry
+  { src: "/photos/mesa-dulce-3.jpg", alt: "Mesa dulce de Umami Bites para un evento en Buenos Aires" },
+  { src: "/photos/carnes-desmechadas-1.jpg", alt: "Carne desmechada al vino — catering para eventos" },
+  { src: "/photos/shots-guacamole.jpg", alt: "Shots de guacamole y nachos — finger food para eventos" },
+  { src: "/photos/mesa-dulce-2.jpg", alt: "Mesa dulce al aire libre para casamientos y cumpleaños" },
+  { src: "/photos/picada-umami-3.jpg", alt: "Picada Umami de autor con fiambres y quesos premium" },
+  { src: "/photos/pinchos-cherry.jpg", alt: "Pinchos de tomate cherry — bocados para eventos" },
 ] as const;
 
 const INTERVAL = 5200; // ms por imagen
@@ -43,11 +44,11 @@ export function HeroSection() {
     >
       {/* Slideshow 4K a pantalla completa: todas montadas (sin tirones) + zoom lento */}
       <motion.div style={{ y: yBg, scale: scaleBg }} className="absolute inset-0 z-0">
-        {SLIDES.map((src, idx) => {
+        {SLIDES.map((slide, idx) => {
           const active = idx === index;
           return (
             <motion.div
-              key={src}
+              key={slide.src}
               aria-hidden={!active}
               initial={false}
               animate={{ opacity: active ? 1 : 0, scale: active ? 1.08 : 1 }}
@@ -58,8 +59,8 @@ export function HeroSection() {
               className="absolute inset-0 will-change-[opacity,transform] [transform:translateZ(0)]"
             >
               <Image
-                src={src}
-                alt="Catering elegante de Umami Bites"
+                src={slide.src}
+                alt={slide.alt}
                 fill
                 priority={idx < 2}
                 quality={90}
@@ -87,7 +88,7 @@ export function HeroSection() {
           transition={{ duration: 0.7 }}
           className="eyebrow"
         >
-          <Sparkles className="size-3.5" /> Catering premium · Envío o retiro
+          <Sparkles className="size-3.5" /> Catering para eventos · Buenos Aires y GBA
         </motion.span>
 
         <h1
@@ -128,7 +129,8 @@ export function HeroSection() {
           className="mt-7 max-w-xl text-lg leading-relaxed text-white/85 drop-shadow-[0_1px_12px_rgba(0,0,0,0.7)]"
         >
           Picadas de autor, menús completos y mesas dulces con producto de primera calidad.
-          Vajilla, mantelería y servicio incluidos.
+          Vajilla, mantelería y servicio incluidos. Llevamos tu evento a CABA y todo el Gran
+          Buenos Aires.
         </motion.p>
 
         <motion.div
@@ -151,7 +153,7 @@ export function HeroSection() {
         <div className="mt-12 flex items-center gap-2.5">
           {SLIDES.map((slide, idx) => (
             <button
-              key={slide}
+              key={slide.src}
               type="button"
               aria-label={`Ver imagen ${idx + 1}`}
               onClick={() => setIndex(idx)}
