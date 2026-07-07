@@ -9,6 +9,7 @@ import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { PackageCard } from "@/components/menu/package-card";
 import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/seo/json-ld";
+import { Testimonials } from "@/components/home/testimonials";
 import { productSchema } from "@/lib/seo/schema";
 import { getAllItems, getItemBySlug, getRelatedItems } from "@/lib/data/menu";
 
@@ -141,6 +142,8 @@ export default async function ItemDetailPage({
           </div>
         </section>
       )}
+
+      <Testimonials />
     </div>
   );
 }

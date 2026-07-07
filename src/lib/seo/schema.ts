@@ -8,6 +8,7 @@
 import { SITE_URL, absoluteUrl } from "@/lib/site";
 import { CONTACT } from "@/lib/contact";
 import type { MenuItem } from "@/lib/types/menu-item";
+import { TESTIMONIALS, aggregateRating } from "@/lib/data/testimonials";
 
 /**
  * Zonas de reparto (negocio de área de servicio, sin dirección visible).
@@ -68,6 +69,33 @@ export function catererSchema() {
 /** Producto + oferta (precio) para la página de detalle de un plato/menú. */
 export function productSchema(item: MenuItem) {
   const url = `${SITE_URL}/menu/${item.slug}`;
+
+  // aggregateRating + review: SOLO si hay reseñas reales cargadas (ver
+  // lib/data/testimonials.ts). Estas mismas reseñas se muestran en la página
+  // (requisito de Google: el markup debe reflejar contenido visible).
+  const agg = aggregateRating();
+  const reviews = agg
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: agg.ratingValue,
+          reviewCount: String(agg.reviewCount),
+          bestRating: "5",
+        },
+        review: TESTIMONIALS.map((t) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: t.author },
+          reviewRating: {
+            "@type": "Rating",
+            ratingValue: String(t.rating),
+            bestRating: "5",
+          },
+          reviewBody: t.body,
+          ...(t.date ? { datePublished: t.date } : {}),
+        })),
+      }
+    : {};
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -76,6 +104,7 @@ export function productSchema(item: MenuItem) {
     image: item.images.map((i) => absoluteUrl(i.url)),
     category: item.category,
     brand: { "@type": "Brand", name: "Umami Bites Catering" },
+    ...reviews,
     offers: {
       "@type": "Offer",
       url,
