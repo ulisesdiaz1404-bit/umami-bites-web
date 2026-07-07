@@ -50,7 +50,6 @@ export default function CheckoutPage() {
     subtotalInCents,
     shippingInCents,
     totalInCents,
-    clear,
     meetsMinimum,
     amountToMinimumInCents,
     minOrderInCents,
@@ -207,9 +206,10 @@ export default function CheckoutPage() {
       }),
     }).catch(() => {});
 
-    // Abre WhatsApp con el pedido precargado y vacía el carrito.
+    // Abre WhatsApp con el pedido precargado. NO vaciamos el carrito: el cliente
+    // puede volver, seguir agregando ítems y reenviar. (Se vacía manualmente
+    // desde el carrito con "Vaciar carrito".)
     window.open(href, "_blank", "noopener,noreferrer");
-    clear();
   }
 
   return (
@@ -376,6 +376,9 @@ export default function CheckoutPage() {
 
           <Button type="button" size="lg" className="w-full" onClick={handleConfirm}>
             <MessageCircle className="size-4" /> Confirmar pedido por WhatsApp
+          </Button>
+          <Button asChild variant="ghost" size="lg" className="w-full">
+            <Link href="/menu">Seguir comprando</Link>
           </Button>
         </form>
 
