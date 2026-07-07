@@ -148,6 +148,9 @@ export function CartDrawer() {
                     Confirmar pedido
                     <ArrowRight className="size-4" />
                   </Button>
+                  <Button variant="ghost" onClick={closeCart} className="w-full">
+                    Seguir comprando
+                  </Button>
                 </footer>
               </>
             )}
