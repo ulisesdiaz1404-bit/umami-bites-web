@@ -23,6 +23,12 @@ export const SHIPPING_IN_CENTS = 50_000; // $500 ARS
 /** Mínimo de compra (subtotal de productos) en centavos (ARS). */
 export const MIN_ORDER_IN_CENTS = 8_000_000; // $80.000 ARS
 
+/**
+ * Categorías "agregado": complementos (finger food) y bebidas. Se suman a un
+ * menú o picada: NO se pueden pedir solos (ver `onlyAddons` en use-cart).
+ */
+export const ADDON_CATEGORIES = ["Complementos", "Bebidas"] as const;
+
 interface CartState {
   items: CartItem[];
   isOpen: boolean;

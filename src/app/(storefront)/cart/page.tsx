@@ -29,6 +29,7 @@ export default function CartPage() {
     meetsMinimum,
     amountToMinimumInCents,
     minOrderInCents,
+    onlyAddons,
   } = useCart();
 
   if (!hydrated) {
@@ -54,7 +55,7 @@ export default function CartPage() {
     );
   }
 
-  const canCheckout = Boolean(deliveryDate) && meetsMinimum;
+  const canCheckout = Boolean(deliveryDate) && meetsMinimum && !onlyAddons;
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-28 pt-32 lg:px-8">
@@ -94,14 +95,21 @@ export default function CartPage() {
 
           <CartSummary />
 
-          {!meetsMinimum && (
+          {onlyAddons ? (
             <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
-              El pedido mínimo es {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
-              <span className="font-semibold text-cream">
-                {formatPrice(amountToMinimumInCents, "ARS")}
-              </span>{" "}
-              para poder confirmar.
+              Los complementos y bebidas se suman a un menú o picada. Agregá al menos un plato
+              principal para poder confirmar.
             </p>
+          ) : (
+            !meetsMinimum && (
+              <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
+                El pedido mínimo es {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
+                <span className="font-semibold text-cream">
+                  {formatPrice(amountToMinimumInCents, "ARS")}
+                </span>{" "}
+                para poder confirmar.
+              </p>
+            )
           )}
 
           <Button

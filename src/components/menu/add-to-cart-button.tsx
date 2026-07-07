@@ -41,6 +41,7 @@ export function AddToCartButton({
         imageUrl: item.images[0]?.url ?? "",
         maxQuantity: item.maxQuantity,
         minQuantity,
+        category: item.category,
         type: item.type,
         unit: item.metadata?.unit,
       },

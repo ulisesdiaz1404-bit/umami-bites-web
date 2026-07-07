@@ -522,7 +522,7 @@ export const MENU_ITEMS: MenuItem[] = [
       "Petit fours surtidos",
       "Budines y muffins variados",
     ],
-    metadata: { unit: "persona" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", minQty: "20" },
   },
   {
     id: "torta-brownie",
@@ -637,7 +637,7 @@ export const MENU_ITEMS: MenuItem[] = [
     type: "package",
     servings: 1,
     includes: ["Fernet cola, Campari, Cuba libre, Gin tonic", "Caipirosk, Caipirinha, Daikiris, Gancia"],
-    metadata: { unit: "persona" },
+    metadata: { unit: "persona", tagline: "Por persona · mínimo 20", minQty: "20" },
   },
 ];
 

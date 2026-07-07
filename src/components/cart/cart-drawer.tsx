@@ -31,6 +31,7 @@ export function CartDrawer() {
     meetsMinimum,
     amountToMinimumInCents,
     minOrderInCents,
+    onlyAddons,
   } = useCart();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -49,7 +50,7 @@ export function CartDrawer() {
     };
   }, [isOpen, closeCart]);
 
-  const canCheckout = !isEmpty && Boolean(deliveryDate) && meetsMinimum;
+  const canCheckout = !isEmpty && Boolean(deliveryDate) && meetsMinimum && !onlyAddons;
 
   const handleConfirm = () => {
     if (!canCheckout) return;
@@ -134,14 +135,21 @@ export function CartDrawer() {
 
                   <CartSummary />
 
-                  {!meetsMinimum && (
+                  {onlyAddons ? (
                     <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
-                      Pedido mínimo {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
-                      <span className="font-semibold text-cream">
-                        {formatPrice(amountToMinimumInCents, "ARS")}
-                      </span>
-                      .
+                      Los complementos y bebidas se suman a un menú o picada. Agregá al menos un
+                      plato principal para confirmar el pedido.
                     </p>
+                  ) : (
+                    !meetsMinimum && (
+                      <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-xs leading-relaxed text-primary/90">
+                        Pedido mínimo {formatPrice(minOrderInCents, "ARS")}. Te faltan{" "}
+                        <span className="font-semibold text-cream">
+                          {formatPrice(amountToMinimumInCents, "ARS")}
+                        </span>
+                        .
+                      </p>
+                    )
                   )}
 
                   <Button onClick={handleConfirm} disabled={!canCheckout} size="lg" className="w-full">

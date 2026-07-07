@@ -59,6 +59,7 @@ export function PurchasePanel({ item }: { item: MenuItem }) {
         imageUrl: item.images[0]?.url ?? "",
         maxQuantity: item.maxQuantity,
         minQuantity: minQty,
+        category: item.category,
         type: item.type,
         unit,
       },

@@ -53,6 +53,7 @@ export default function CheckoutPage() {
     meetsMinimum,
     amountToMinimumInCents,
     minOrderInCents,
+    onlyAddons,
   } = useCart();
   const settings = useSettings();
   const isPickup = deliveryZone?.kind === "pickup";
@@ -140,6 +141,12 @@ export default function CheckoutPage() {
     }
     if (!payment) {
       setError("Elegí un método de pago.");
+      return;
+    }
+    if (onlyAddons) {
+      setError(
+        "Los complementos y bebidas se suman a un menú o picada. Agregá al menos un plato principal para confirmar."
+      );
       return;
     }
     if (!meetsMinimum) {

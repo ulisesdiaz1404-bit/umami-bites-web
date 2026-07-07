@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCartStore } from "@/lib/stores/cart-store";
+import { useCartStore, ADDON_CATEGORIES } from "@/lib/stores/cart-store";
 import { useSettings } from "@/components/settings-context";
 import { getDeliveryOption, ADDRESS_ZONE_ID, type DeliveryZone } from "@/lib/data/delivery-zones";
 
@@ -46,6 +46,11 @@ export function useCart() {
   const meetsMinimum = subtotalInCents >= minOrder;
   const amountToMinimumInCents = Math.max(0, minOrder - subtotalInCents);
 
+  // Complementos y bebidas se suman a un menú o picada: no se piden solos.
+  const onlyAddons =
+    store.items.length > 0 &&
+    store.items.every((i) => (ADDON_CATEGORIES as readonly string[]).includes(i.category ?? ""));
+
   return {
     ...store,
     hydrated,
@@ -59,5 +64,6 @@ export function useCart() {
     minOrderInCents: minOrder,
     meetsMinimum,
     amountToMinimumInCents,
+    onlyAddons,
   };
 }
