@@ -120,6 +120,9 @@ export function buildOrderWhatsappHref(phone: string, o: OrderPayload): string {
 
 const INSTAGRAM_URL = "https://www.instagram.com/umami.bites.catering/";
 
+/** Enlace directo para dejar reseña en Google (ficha de Umami Bites). */
+const GOOGLE_REVIEW_URL = "https://g.page/r/CR0paU03dmRREBM/review";
+
 /** Mensaje amable pidiendo calificación al cliente tras la entrega. */
 export function buildReviewMessage(customerName?: string): string {
   const hola = customerName?.trim() ? `¡Hola ${customerName.trim()}! ` : "¡Hola! ";
@@ -128,7 +131,8 @@ export function buildReviewMessage(customerName?: string): string {
     "",
     "¡Gracias por tu pedido! Esperamos que hayas disfrutado todo 😃",
     "",
-    "¿Nos dejarías tu opinión? Nos ayuda un montón a seguir creciendo. Con una o dos líneas contándonos qué te pareció ya nos hacés felices 🙌",
+    "¿Nos dejarías una reseña en Google? Te toma 20 segundos y nos ayuda un montón a que más gente nos conozca 🙏",
+    GOOGLE_REVIEW_URL,
     "",
     `Y si querés, seguinos y etiquetanos en Instagram 📸 ${INSTAGRAM_URL}`,
     "",
