@@ -13,6 +13,10 @@ if (dsn) {
     dsn,
     tracesSampleRate: 1,
     // Sin Session Replay: evita workers/blob que chocarían con la CSP estricta.
+    // Ruido de scripts que inyectan los navegadores internos (Instagram/Facebook):
+    // no es código nuestro, se ignora para no ensuciar los issues.
+    ignoreErrors: ["window.webkit.messageHandlers"],
+    denyUrls: [/^app:\/\//],
   });
 }
 
