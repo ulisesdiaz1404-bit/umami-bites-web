@@ -7,6 +7,7 @@
 
 import { SITE_URL, absoluteUrl } from "@/lib/site";
 import { CONTACT } from "@/lib/contact";
+import { displayPriceInCents } from "@/lib/data/menu-variants";
 import type { MenuItem } from "@/lib/types/menu-item";
 import { TESTIMONIALS, aggregateRating } from "@/lib/data/testimonials";
 
@@ -110,7 +111,7 @@ export function productSchema(item: MenuItem) {
       url,
       priceCurrency: item.currency,
       // schema.org espera el precio en unidades (no centavos).
-      price: (item.priceInCents / 100).toFixed(2),
+      price: (displayPriceInCents(item) / 100).toFixed(2),
       availability: item.available
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",

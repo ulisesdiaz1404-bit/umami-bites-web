@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Plus } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { useCartStore } from "@/lib/stores/cart-store";
+import { parseVariants } from "@/lib/data/menu-variants";
 import type { MenuItem } from "@/lib/types/menu-item";
 
 interface AddToCartButtonProps extends Omit<ButtonProps, "onClick" | "children"> {
@@ -30,14 +31,18 @@ export function AddToCartButton({
   const minQuantity = Number(item.metadata?.minQty) || 1;
   const qtyToAdd = quantity ?? minQuantity;
 
+  // Si el ítem tiene variantes, agrega la primera (mismo id/nombre/precio que
+  // el panel de detalle) para que card y detalle nunca difieran en el carrito.
+  const firstVariant = parseVariants(item)?.[0];
+
   const handleAdd = () => {
     if (!item.available) return;
     addItem(
       {
-        menuItemId: item.id,
+        menuItemId: firstVariant ? `${item.id}__0` : item.id,
         slug: item.slug,
-        name: item.name,
-        priceInCents: item.priceInCents,
+        name: firstVariant ? `${item.name} (${firstVariant.label})` : item.name,
+        priceInCents: firstVariant?.priceInCents ?? item.priceInCents,
         imageUrl: item.images[0]?.url ?? "",
         maxQuantity: item.maxQuantity,
         minQuantity,

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { AddToCartButton } from "@/components/menu/add-to-cart-button";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { displayPriceInCents } from "@/lib/data/menu-variants";
 import type { MenuItem } from "@/lib/types/menu-item";
 
 /** Card para plato individual (type: "dish"). */
@@ -54,7 +55,7 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
         <div className="mt-4 flex items-end justify-between gap-3 pt-2">
           <div>
             <span className="price text-xl">
-              {formatPrice(item.priceInCents, item.currency)}
+              {formatPrice(displayPriceInCents(item), item.currency)}
             </span>
             {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}
           </div>

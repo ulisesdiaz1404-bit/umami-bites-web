@@ -6,24 +6,8 @@ import { Check, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { cn, formatPrice, formatUnit } from "@/lib/utils";
+import { parseVariants } from "@/lib/data/menu-variants";
 import type { MenuItem } from "@/lib/types/menu-item";
-
-interface Variant {
-  label: string;
-  priceInCents: number;
-}
-
-/** Lee las variantes (opciones) de metadata.variants (JSON). */
-function parseVariants(item: MenuItem): Variant[] | null {
-  const raw = item.metadata?.variants;
-  if (!raw) return null;
-  try {
-    const v = JSON.parse(raw);
-    return Array.isArray(v) && v.length > 0 ? (v as Variant[]) : null;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Panel de compra del detalle: precio, selector de opción (si el ítem tiene

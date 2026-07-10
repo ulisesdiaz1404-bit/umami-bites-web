@@ -8,6 +8,7 @@ import { Check, ChevronDown, Sparkles, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AddToCartButton } from "@/components/menu/add-to-cart-button";
 import { cn, formatPrice } from "@/lib/utils";
+import { displayPriceInCents } from "@/lib/data/menu-variants";
 import type { MenuItem } from "@/lib/types/menu-item";
 
 /** Card para paquete / menú (type: "package"), con lista de incluidos expandible. */
@@ -17,6 +18,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
   const unit = item.metadata?.unit;
   const tagline = item.metadata?.tagline;
   const minQty = Number(item.metadata?.minQty) || 0;
+  const price = displayPriceInCents(item);
   // Etiqueta de personas: usa tagline si existe; si es precio por persona,
   // muestra "Precio por persona" en vez del erróneo "Para 1 personas".
   const servingsLabel =
@@ -118,7 +120,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
           <div>
             <div>
               <span className="price text-2xl">
-                {formatPrice(item.priceInCents, item.currency)}
+                {formatPrice(price, item.currency)}
               </span>
               {unit && <span className="ml-1 text-xs text-muted">/ {unit}</span>}
             </div>
@@ -126,7 +128,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
               <p className="mt-1 text-[0.7rem] leading-tight text-muted">
                 mínimo {minQty} personas · total desde{" "}
                 <span className="font-semibold text-primary">
-                  {formatPrice(item.priceInCents * minQty, item.currency)}
+                  {formatPrice(price * minQty, item.currency)}
                 </span>
               </p>
             )}
