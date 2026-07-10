@@ -24,19 +24,23 @@ export interface Testimonial {
   date?: string;
 }
 
-// -------------------------------------------------------------------
-// PEGAR ACÁ las reseñas reales. Ejemplo del formato (borrar y reemplazar):
-//
-// export const TESTIMONIALS: Testimonial[] = [
-//   {
-//     author: "María G.",
-//     rating: 5,
-//     body: "La picada Umami fue el centro de la mesa. Impecable presentación y todo riquísimo.",
-//     date: "2026-05-12",
-//   },
-// ];
-// -------------------------------------------------------------------
-export const TESTIMONIALS: Testimonial[] = [];
+// Reseñas reales de la ficha de Google (Umami Bites Catering). Solo se cargan
+// las que tienen texto; las de solo estrellas no se pueden mostrar ni marcar
+// como Review. Al llegar reseñas nuevas con texto, agregarlas acá.
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    author: "Guada Calcagno",
+    rating: 5,
+    body: "Todo riquísimo. Excelente calidad. Las picadas sublimes!! Super recomendable!",
+    date: "2026-07-09",
+  },
+  {
+    author: "Magali Perez",
+    rating: 5,
+    body: "Hice un pedido... super rico todo y re personalizada la atencion!!!",
+    date: "2026-07-09",
+  },
+];
 
 /**
  * Calificación agregada a partir de las reseñas reales.
