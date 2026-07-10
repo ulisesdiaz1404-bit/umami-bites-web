@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/home/hero-section";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { FeaturedDishes } from "@/components/home/featured-dishes";
 import { PackagesSection } from "@/components/home/packages-section";
+import { Testimonials } from "@/components/home/testimonials";
 
 // ISR: los destacados reflejan ediciones del admin.
 export const revalidate = 60;
@@ -18,6 +19,7 @@ export default function HomePage() {
       <HowItWorks />
       <PackagesSection />
       <FeaturedDishes />
+      <Testimonials />
     </>
   );
 }
