@@ -26,7 +26,8 @@ async function uploadMenuImage(
   });
 
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-  const path = `${slug || "item"}-${Date.now()}.${ext}`;
+  // Sufijo aleatorio: varias fotos subidas en el mismo ms no se pisan entre sí.
+  const path = `${slug || "item"}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const { error } = await admin.storage.from(IMAGE_BUCKET).upload(path, file, {
     contentType: file.type || "image/jpeg",
     upsert: true,
@@ -41,6 +42,9 @@ export interface MenuFormState {
   ok: boolean;
   error?: string;
 }
+
+/** Tope de fotos por ítem (portada + galería). */
+const MAX_IMAGES = 8;
 
 function parseIncludes(value: string): string[] | null {
   const arr = value
@@ -73,7 +77,6 @@ export async function saveMenuItem(
 
   if (!name || !slug) return { ok: false, error: "Nombre y slug son obligatorios." };
 
-  let imageUrl = String(formData.get("imageUrl") ?? "").trim();
   const servingsRaw = String(formData.get("servings") ?? "").trim();
 
   // Costo → metadata.cost (en centavos), preservando otras claves (ej. unit).
@@ -97,13 +100,30 @@ export async function saveMenuItem(
     metadata = Object.keys(rest).length ? rest : null;
   }
 
-  // Si el dueño subió un archivo, se sube a Storage y su URL pisa a la manual.
-  const imageFile = formData.get("imageFile");
-  if (imageFile instanceof File && imageFile.size > 0) {
-    const uploaded = await uploadMenuImage(imageFile, slug);
-    if (uploaded.error) return { ok: false, error: uploaded.error };
-    if (uploaded.url) imageUrl = uploaded.url;
+  // Fotos: el form manda la lista ya ordenada (la primera es la portada) como
+  // JSON en existingImages, más los archivos nuevos en imageFiles. Las nuevas
+  // se suben a Storage y se agregan al final; el dueño las reordena al editar.
+  let images: { url: string; alt: string }[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("existingImages") ?? "[]"));
+    if (Array.isArray(parsed)) {
+      images = parsed
+        .filter((img): img is { url: string } => Boolean(img) && typeof img.url === "string" && img.url.trim() !== "")
+        .map((img) => ({ url: img.url.trim(), alt: name }));
+    }
+  } catch {
+    // JSON inválido → se ignora y quedan solo las fotos nuevas.
   }
+
+  const newFiles = formData
+    .getAll("imageFiles")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  for (const file of newFiles) {
+    const uploaded = await uploadMenuImage(file, slug);
+    if (uploaded.error) return { ok: false, error: uploaded.error };
+    if (uploaded.url) images.push({ url: uploaded.url, alt: name });
+  }
+  images = images.slice(0, MAX_IMAGES);
 
   const row = {
     slug,
@@ -117,7 +137,7 @@ export async function saveMenuItem(
     type: String(formData.get("type") ?? "dish"),
     servings: servingsRaw ? Number(servingsRaw) : null,
     includes: parseIncludes(String(formData.get("includes") ?? "")),
-    images: imageUrl ? [{ url: imageUrl, alt: name }] : [],
+    images,
     metadata,
   };
 

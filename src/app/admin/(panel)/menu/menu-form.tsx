@@ -1,16 +1,19 @@
 "use client";
 
-import { useActionState, useState, type ReactNode, type ChangeEvent } from "react";
+import { useActionState, useRef, useState, type ReactNode, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, ImagePlus } from "lucide-react";
+import { Plus, Eye, ImagePlus, X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatPrice } from "@/lib/utils";
-import type { MenuItem } from "@/lib/types/menu-item";
+import type { MenuItem, MenuImage } from "@/lib/types/menu-item";
 import { saveMenuItem, type MenuFormState } from "./actions";
 
 const initial: MenuFormState = { ok: false };
+
+/** Mismo tope que en actions.ts. */
+const MAX_IMAGES = 8;
 
 interface FormValues {
   name: string;
@@ -22,9 +25,14 @@ interface FormValues {
   category: string;
   type: "dish" | "package";
   servings: string;
-  imageUrl: string;
   includes: string;
   available: boolean;
+}
+
+/** Foto nueva elegida en el dispositivo, todavía sin subir. */
+interface PendingFile {
+  file: File;
+  preview: string;
 }
 
 function fromItem(item?: MenuItem): FormValues {
@@ -39,7 +47,6 @@ function fromItem(item?: MenuItem): FormValues {
     category: item?.category ?? "",
     type: item?.type ?? "dish",
     servings: item?.servings ? String(item.servings) : "",
-    imageUrl: item?.images?.[0]?.url ?? "",
     includes: item?.includes?.join("\n") ?? "",
     available: item?.available ?? true,
   };
@@ -58,29 +65,84 @@ export function MenuForm({
   const router = useRouter();
   const [state, formAction, pending] = useActionState(saveMenuItem, initial);
   const [v, setV] = useState<FormValues>(() => fromItem(item));
-  // Preview local (blob) de la foto recién elegida, antes de guardarla.
-  const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
+  // Fotos ya guardadas (URLs), en orden: la primera es la portada.
+  const [images, setImages] = useState<MenuImage[]>(() => item?.images ?? []);
+  // Fotos nuevas elegidas en el dispositivo, con preview local (blob).
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [manualUrl, setManualUrl] = useState("");
   const [fileError, setFileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) =>
     setV((prev) => ({ ...prev, [key]: value }));
 
-  function onPickFile(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    setFileError(null);
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) {
-      setFileError("La foto pesa más de 8 MB. Usá una más liviana.");
-      e.target.value = "";
-      return;
-    }
-    if (filePreview) URL.revokeObjectURL(filePreview);
-    setFilePreview(URL.createObjectURL(file));
-    setFileName(file.name);
+  const totalImages = images.length + pendingFiles.length;
+
+  /** El input file real viaja con el form: se reconstruye con DataTransfer
+   *  para que siempre contenga exactamente las fotos pendientes. */
+  function syncInput(files: PendingFile[]) {
+    if (!fileInputRef.current) return;
+    const dt = new DataTransfer();
+    files.forEach((p) => dt.items.add(p.file));
+    fileInputRef.current.files = dt.files;
   }
 
-  const previewImage = filePreview ?? v.imageUrl;
+  function onPickFiles(e: ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    setFileError(null);
+    const accepted: PendingFile[] = [];
+    for (const file of picked) {
+      if (file.size > 8 * 1024 * 1024) {
+        setFileError(`"${file.name}" pesa más de 8 MB. Usá una más liviana.`);
+        continue;
+      }
+      // Evita duplicar si el navegador re-entrega archivos ya elegidos.
+      const dup = pendingFiles.some(
+        (p) => p.file.name === file.name && p.file.size === file.size
+      );
+      if (!dup) accepted.push({ file, preview: URL.createObjectURL(file) });
+    }
+    let next = [...pendingFiles, ...accepted];
+    if (images.length + next.length > MAX_IMAGES) {
+      setFileError(`Máximo ${MAX_IMAGES} fotos por ítem.`);
+      next.slice(MAX_IMAGES - images.length).forEach((p) => URL.revokeObjectURL(p.preview));
+      next = next.slice(0, MAX_IMAGES - images.length);
+    }
+    setPendingFiles(next);
+    syncInput(next);
+  }
+
+  function removePending(index: number) {
+    const removed = pendingFiles[index];
+    if (removed) URL.revokeObjectURL(removed.preview);
+    const next = pendingFiles.filter((_, i) => i !== index);
+    setPendingFiles(next);
+    syncInput(next);
+  }
+
+  function removeImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function makeCover(index: number) {
+    setImages((prev) => {
+      const cover = prev[index];
+      return cover ? [cover, ...prev.filter((_, i) => i !== index)] : prev;
+    });
+  }
+
+  function addManualUrl() {
+    const url = manualUrl.trim();
+    if (!url) return;
+    if (totalImages >= MAX_IMAGES) {
+      setFileError(`Máximo ${MAX_IMAGES} fotos por ítem.`);
+      return;
+    }
+    setImages((prev) => [...prev, { url, alt: v.name }]);
+    setManualUrl("");
+  }
+
+  const previewImage = images[0]?.url ?? pendingFiles[0]?.preview ?? "";
 
   return (
     <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
@@ -128,37 +190,111 @@ export function MenuForm({
             />
           </div>
           <div className="space-y-2">
-            <Label>Foto del plato</Label>
+            <div className="flex items-center justify-between">
+              <Label>Fotos del plato</Label>
+              <span className="text-[11px] text-muted">
+                {totalImages}/{MAX_IMAGES} · la primera es la portada
+              </span>
+            </div>
+
+            {/* Lista de fotos ya guardadas + reordenar antes de guardar */}
+            <input type="hidden" name="existingImages" value={JSON.stringify(images)} />
+            {(images.length > 0 || pendingFiles.length > 0) && (
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {images.map((img, i) => (
+                  <div
+                    key={img.url + i}
+                    className="group relative aspect-square overflow-hidden rounded-base border border-line bg-bg-deep"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.url} alt={img.alt} className="size-full object-cover" />
+                    {i === 0 && (
+                      <span className="absolute left-1 top-1 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                        Portada
+                      </span>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1 bg-gradient-to-t from-black/70 to-transparent p-1">
+                      {i > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => makeCover(i)}
+                          title="Hacer portada"
+                          className="rounded-full bg-white/90 p-1 text-[#b07a3c] hover:bg-white"
+                        >
+                          <Star className="size-3.5" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        title="Quitar foto"
+                        className="rounded-full bg-white/90 p-1 text-[#a83422] hover:bg-white"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {pendingFiles.map((p, i) => (
+                  <div
+                    key={p.preview}
+                    className="relative aspect-square overflow-hidden rounded-base border border-dashed border-accent/60 bg-bg-deep"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.preview} alt={p.file.name} className="size-full object-cover" />
+                    <span className="absolute left-1 top-1 rounded-full bg-[#2563eb] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      Nueva
+                    </span>
+                    <div className="absolute inset-x-0 bottom-0 flex justify-end bg-gradient-to-t from-black/70 to-transparent p-1">
+                      <button
+                        type="button"
+                        onClick={() => removePending(i)}
+                        title="Quitar foto"
+                        className="rounded-full bg-white/90 p-1 text-[#a83422] hover:bg-white"
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <label className="flex cursor-pointer items-center gap-3 rounded-base border border-dashed border-accent/50 bg-accent/5 px-4 py-3 text-sm text-accent transition-colors hover:bg-accent/10">
               <ImagePlus className="size-5 shrink-0" />
               <span className="min-w-0 flex-1 truncate">
-                {fileName ?? (v.imageUrl ? "Cambiar foto" : "Subir foto desde tu dispositivo")}
+                {totalImages > 0 ? "Agregar más fotos" : "Subir fotos desde tu dispositivo"}
               </span>
               <input
+                ref={fileInputRef}
                 type="file"
-                name="imageFile"
+                name="imageFiles"
                 accept="image/*"
-                onChange={onPickFile}
+                multiple
+                onChange={onPickFiles}
                 className="hidden"
               />
             </label>
             {fileError && <p className="text-xs text-danger">{fileError}</p>}
             <p className="text-[11px] text-muted">
-              JPG, PNG o WEBP hasta 8 MB. La foto queda guardada y podés cambiarla cuando quieras.
+              JPG, PNG o WEBP hasta 8 MB cada una. Podés elegir varias a la vez; las nuevas se
+              suben al guardar. La ⭐ hace portada y la ✕ quita la foto.
             </p>
 
             <details className="text-xs text-muted">
               <summary className="cursor-pointer select-none py-1 hover:text-cream">
-                O usar una URL manual (avanzado)
+                O agregar una URL manual (avanzado)
               </summary>
-              <Input
-                id="imageUrl"
-                name="imageUrl"
-                value={v.imageUrl}
-                onChange={(e) => set("imageUrl", e.target.value)}
-                placeholder="/photos/p01.jpg"
-                className="mt-2"
-              />
+              <div className="mt-2 flex gap-2">
+                <Input
+                  value={manualUrl}
+                  onChange={(e) => setManualUrl(e.target.value)}
+                  placeholder="/photos/p01.jpg"
+                />
+                <Button type="button" variant="outline" onClick={addManualUrl}>
+                  Agregar
+                </Button>
+              </div>
             </details>
           </div>
         </div>
