@@ -85,6 +85,17 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
             </WaCta>
           </div>
         </div>
+
+        <div className="mt-6 border-t border-line/60 pt-5 text-center">
+          <a
+            href="https://ulises-studio-web.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted/70 underline-offset-4 transition-colors hover:text-accent hover:underline"
+          >
+            Ulises Studio
+          </a>
+        </div>
       </div>
     </footer>
   );
