@@ -2,12 +2,13 @@
 
 import { useActionState, useRef, useState, type ReactNode, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, ImagePlus, X, Star } from "lucide-react";
+import { Plus, Eye, ImagePlus, X, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatPrice } from "@/lib/utils";
 import type { MenuItem, MenuImage } from "@/lib/types/menu-item";
+import { parseVariants } from "@/lib/data/menu-variants";
 import { saveMenuItem, type MenuFormState } from "./actions";
 
 const initial: MenuFormState = { ok: false };
@@ -22,6 +23,7 @@ interface FormValues {
   price: string;
   cost: string;
   maxQuantity: string;
+  minQty: string;
   category: string;
   type: "dish" | "package";
   servings: string;
@@ -44,12 +46,19 @@ function fromItem(item?: MenuItem): FormValues {
     price: item ? String(item.priceInCents / 100) : "",
     cost: costCents > 0 ? String(costCents / 100) : "",
     maxQuantity: String(item?.maxQuantity ?? 10),
+    minQty: Number(item?.metadata?.minQty) > 1 ? String(item?.metadata?.minQty) : "",
     category: item?.category ?? "",
     type: item?.type ?? "dish",
     servings: item?.servings ? String(item.servings) : "",
     includes: item?.includes?.join("\n") ?? "",
     available: item?.available ?? true,
   };
+}
+
+/** Opción editable (ej. "Comen 10 · pican 20" a $180.000). Precio en pesos. */
+interface VariantRow {
+  label: string;
+  price: string;
 }
 
 const inputBase =
@@ -69,6 +78,12 @@ export function MenuForm({
   const [images, setImages] = useState<MenuImage[]>(() => item?.images ?? []);
   // Fotos nuevas elegidas en el dispositivo, con preview local (blob).
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [variants, setVariants] = useState<VariantRow[]>(() =>
+    (item ? parseVariants(item) ?? [] : []).map((x) => ({
+      label: x.label,
+      price: String(x.priceInCents / 100),
+    }))
+  );
   const [manualUrl, setManualUrl] = useState("");
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -342,6 +357,69 @@ export function MenuForm({
               value={v.maxQuantity}
               onChange={(e) => set("maxQuantity", e.target.value)}
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="minQty">Mínimo de personas / unidades</Label>
+            <Input
+              id="minQty"
+              name="minQty"
+              type="number"
+              min="1"
+              value={v.minQty}
+              onChange={(e) => set("minQty", e.target.value)}
+              placeholder="vacío = sin mínimo (ej. 20)"
+            />
+          </div>
+
+          {/* Opciones con precio propio (ej. x10 personas / x20 personas) */}
+          <div className="space-y-2 rounded-base border border-line bg-bg-deep/60 p-4">
+            <div className="flex items-center justify-between">
+              <Label>Opciones / tamaños</Label>
+              <span className="text-[11px] text-muted">
+                Si hay opciones, la primera define el precio de la card
+              </span>
+            </div>
+            <input type="hidden" name="variants" value={JSON.stringify(variants)} />
+            {variants.map((row, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  aria-label={`Nombre de la opción ${i + 1}`}
+                  value={row.label}
+                  onChange={(e) =>
+                    setVariants((prev) => prev.map((r, j) => (j === i ? { ...r, label: e.target.value } : r)))
+                  }
+                  placeholder="ej. Comen 10 · pican 20"
+                />
+                <Input
+                  aria-label={`Precio de la opción ${i + 1} (ARS)`}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="w-36"
+                  value={row.price}
+                  onChange={(e) =>
+                    setVariants((prev) => prev.map((r, j) => (j === i ? { ...r, price: e.target.value } : r)))
+                  }
+                  placeholder="Precio"
+                />
+                <button
+                  type="button"
+                  onClick={() => setVariants((prev) => prev.filter((_, j) => j !== i))}
+                  title="Quitar opción"
+                  className="rounded-full p-2 text-[#a83422] hover:bg-[#f8e7e3]"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setVariants((prev) => [...prev, { label: "", price: "" }])}
+              className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent hover:bg-accent/20"
+            >
+              <Plus className="size-3.5" /> Agregar opción
+            </button>
           </div>
 
           <label

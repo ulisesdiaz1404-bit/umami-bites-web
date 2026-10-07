@@ -100,6 +100,34 @@ export async function saveMenuItem(
     metadata = Object.keys(rest).length ? rest : null;
   }
 
+  // Mínimo de personas → metadata.minQty (vacío o 1 = sin mínimo).
+  const minQtyRaw = Math.floor(Number(String(formData.get("minQty") ?? "").trim()));
+  {
+    const { minQty: _dropMin, ...rest } = metadata ?? {};
+    metadata = minQtyRaw > 1 ? { ...rest, minQty: String(minQtyRaw) } : rest;
+  }
+
+  // Opciones con precio propio → metadata.variants (JSON string, como lee parseVariants).
+  let variants: { label: string; priceInCents: number }[] = [];
+  try {
+    const parsed = JSON.parse(String(formData.get("variants") ?? "[]"));
+    if (Array.isArray(parsed)) {
+      variants = parsed
+        .map((r: { label?: unknown; price?: unknown }) => ({
+          label: String(r?.label ?? "").trim(),
+          priceInCents: Math.round(Number(r?.price) * 100),
+        }))
+        .filter((r) => r.label && Number.isFinite(r.priceInCents) && r.priceInCents >= 0);
+    }
+  } catch {
+    // JSON inválido → sin opciones.
+  }
+  {
+    const { variants: _dropVar, ...rest } = metadata ?? {};
+    metadata = variants.length ? { ...rest, variants: JSON.stringify(variants) } : rest;
+  }
+  if (metadata && Object.keys(metadata).length === 0) metadata = null;
+
   // Fotos: el form manda la lista ya ordenada (la primera es la portada) como
   // JSON en existingImages, más los archivos nuevos en imageFiles. Las nuevas
   // se suben a Storage y se agregan al final; el dueño las reordena al editar.
@@ -129,7 +157,10 @@ export async function saveMenuItem(
     slug,
     name,
     description: String(formData.get("description") ?? "").trim(),
-    price_in_cents: Math.round(Number(formData.get("price") ?? 0) * 100),
+    // Con opciones, el precio base se mantiene sincronizado con la primera.
+    price_in_cents: variants.length
+      ? variants[0]!.priceInCents
+      : Math.round(Number(formData.get("price") ?? 0) * 100),
     currency: "ARS",
     available: formData.get("available") === "on",
     max_quantity: Math.max(1, Number(formData.get("maxQuantity") ?? 1)),
