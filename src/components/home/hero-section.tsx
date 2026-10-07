@@ -7,15 +7,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// Mejores fotos reales (horizontales, alta calidad) para el slideshow de portada.
+// Foto de portada (se pueden sumar más para volver al slideshow).
 // Cada una con alt propio y descriptivo (mejor accesibilidad + SEO).
 const SLIDES = [
-  { src: "/photos/mesa-dulce-3.jpg", alt: "Mesa dulce de Umami Bites para un evento en Buenos Aires" },
-  { src: "/photos/carnes-desmechadas-1.jpg", alt: "Carne desmechada al vino — catering para eventos" },
-  { src: "/photos/shots-guacamole.jpg", alt: "Shots de guacamole y nachos — finger food para eventos" },
-  { src: "/photos/mesa-dulce-2.jpg", alt: "Mesa dulce al aire libre para casamientos y cumpleaños" },
-  { src: "/photos/picada-umami-3.jpg", alt: "Picada Umami de autor con fiambres y quesos premium" },
-  { src: "/photos/pinchos-cherry.jpg", alt: "Pinchos de tomate cherry — bocados para eventos" },
+  { src: "/photos/portada-picada.jpg", alt: "Picada Umami de autor con fiambres, quesos y frutas para eventos" },
 ] as const;
 
 const INTERVAL = 5200; // ms por imagen
@@ -150,7 +145,7 @@ export function HeroSection() {
         </motion.div>
 
         {/* Indicadores del slideshow */}
-        <div className="mt-12 flex items-center gap-2.5">
+        <div hidden={SLIDES.length < 2} className="mt-12 flex items-center gap-2.5">
           {SLIDES.map((slide, idx) => (
             <button
               key={slide.src}
