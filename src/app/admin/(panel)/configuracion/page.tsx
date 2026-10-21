@@ -30,7 +30,7 @@ export default async function ConfiguracionPage() {
       </div>
 
       {probe.error && (
-        <div className="rounded-2xl border border-[#e8d3ac] bg-[#f7edda] p-6 text-sm text-[#8a5a1e]">
+        <div className="rounded-2xl border border-accent/30 bg-accent/10 p-6 text-sm text-accent">
           <p className="font-semibold">Falta un paso de configuración (una sola vez).</p>
           <p className="mt-2">
             Para guardar cambios, corré la migración{" "}

@@ -198,7 +198,7 @@ export function NewOrderNotifier() {
         <div
           key={t.id}
           role="alert"
-          className="flex items-start gap-3 rounded-2xl border border-[#2f8f4e]/40 bg-white p-4 shadow-lg"
+          className="flex items-start gap-3 rounded-2xl border border-[#2f8f4e]/40 bg-surface p-4 shadow-lg"
           style={{ animation: "umami-toast-in .28s ease-out" }}
         >
           <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f1e8] text-[#2f8f4e]">

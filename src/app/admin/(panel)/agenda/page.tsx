@@ -1,4 +1,6 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loadAdminData } from "@/lib/admin/data";
+import { AdminDataError } from "@/components/admin/data-error";
+import { PageHeader } from "@/components/admin/kit";
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice, formatUnit } from "@/lib/utils";
 import { STATUS_META, statusOf, waHref } from "@/lib/admin/orders";
@@ -27,21 +29,11 @@ function dayLabel(date: string): { title: string; sub: string } {
 }
 
 export default async function AgendaPage() {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
-    return (
-      <div className="rounded-2xl border border-line bg-surface p-8">
-        <h1 className="font-display text-2xl text-cream">Agenda de entregas</h1>
-        <p className="mt-3 text-sm text-muted">Conectá Supabase para ver la agenda.</p>
-      </div>
-    );
-  }
-
-  const { data } = await supabase
-    .from("orders")
-    .select("*")
-    .not("delivery_date", "is", null)
-    .order("delivery_date", { ascending: true });
+  const result = await loadAdminData();
+  if (!result.ok) return <AdminDataError title="Agenda de entregas" result={result} />;
+  const data = result.orders
+    .filter((o) => o.delivery_date)
+    .sort((a, b) => (a.delivery_date as string).localeCompare(b.delivery_date as string));
 
   const today = todayStr();
   // Solo pendientes de preparar: nuevo o confirmado (entregado/cancelado se ocultan).
@@ -61,12 +53,10 @@ export default async function AgendaPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl text-cream">Agenda de entregas</h1>
-        <p className="mt-1 text-sm text-muted">
-          Qué preparar y cuándo. Solo pedidos activos con fecha de entrega, de hoy en adelante.
-        </p>
-      </div>
+      <PageHeader
+        title="Agenda de entregas"
+        description="Qué entregar y cuándo. Solo pedidos activos con fecha de entrega, de hoy en adelante."
+      />
 
       {days.length === 0 ? (
         <p className="rounded-2xl border border-line bg-surface p-10 text-center text-sm text-muted">
@@ -96,8 +86,8 @@ export default async function AgendaPage() {
                     <CalendarDays className="size-5" />
                   </div>
                   <div>
-                    <h2 className="font-display text-xl capitalize text-cream">{title}</h2>
-                    {sub && <p className="text-xs capitalize text-muted">{sub}</p>}
+                    <h2 className="font-display text-xl text-cream first-letter:uppercase">{title}</h2>
+                    {sub && <p className="text-xs text-muted first-letter:uppercase">{sub}</p>}
                   </div>
                   <span className="ml-auto text-sm font-medium text-accent">
                     {dayOrders.length} {dayOrders.length === 1 ? "pedido" : "pedidos"} ·{" "}
@@ -106,15 +96,15 @@ export default async function AgendaPage() {
                 </div>
 
                 {/* Resumen de cocina */}
-                <div className="mb-3 rounded-xl border border-[#e8d3ac] bg-[#f7edda] p-4">
-                  <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[#8a5a1e]">
+                <div className="mb-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
+                  <p className="mb-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent">
                     <ChefHat className="size-4" /> Para preparar
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {[...prep.entries()].map(([name, qty]) => (
                       <span
                         key={name}
-                        className="rounded-full bg-white px-3 py-1 text-xs font-medium text-primary shadow-sm"
+                        className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-primary shadow-sm"
                       >
                         <span className="text-accent">{qty}×</span> {name}
                       </span>

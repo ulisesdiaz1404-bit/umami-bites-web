@@ -1,29 +1,27 @@
 import type { Metadata } from "next";
-import { SignOutButton } from "@/components/admin/sign-out-button";
-import { AdminNav } from "@/components/admin/admin-nav";
+import { cookies } from "next/headers";
 import { NewOrderNotifier } from "@/components/admin/new-order-notifier";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { loadAdminData, loadAdminUser } from "@/lib/admin/data";
+import { computeNavCounts } from "@/lib/admin/analytics";
 
 export const metadata: Metadata = {
   title: "Panel · Umami Bites",
   robots: { index: false, follow: false },
 };
 
-export default function AdminPanelLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
+  const [data, email, cookieStore] = await Promise.all([loadAdminData(), loadAdminUser(), cookies()]);
+  const counts = data.ok ? computeNavCounts(data.orders) : { newOrders: 0, deliveriesSoon: 0, alerts: 0 };
+  // El estado del menú (abierto/contraído) se lee de la cookie: sin salto al cargar.
+  const defaultOpen = cookieStore.get("admin-sidebar")?.value !== "0";
+
   return (
-    <div className="min-h-screen bg-bg">
+    <>
       <NewOrderNotifier />
-      <header className="sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
-          <div className="flex items-center gap-4">
-            <span className="font-display text-lg text-cream">
-              Umami <span className="text-accent">Admin</span>
-            </span>
-            <AdminNav />
-          </div>
-          <SignOutButton />
-        </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
-    </div>
+      <AdminShell counts={counts} email={email} demo={data.ok && data.demo} defaultOpen={defaultOpen}>
+        <div className="mx-auto w-full max-w-[1240px] px-4 py-7 sm:px-6 lg:px-10 lg:py-10">{children}</div>
+      </AdminShell>
+    </>
   );
 }

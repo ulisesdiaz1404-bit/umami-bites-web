@@ -14,14 +14,16 @@ export const ORDER_STATUSES: OrderStatus[] = [
   "cancelado",
 ];
 
+// Tintes semitransparentes del color de cada estado: se leen bien tanto
+// sobre el fondo claro como en modo oscuro.
 export const STATUS_META: Record<
   OrderStatus,
   { label: string; fg: string; bg: string; border: string; dot: string }
 > = {
-  nuevo: { label: "Nuevo", fg: "#1f4fb0", bg: "#e9effc", border: "#c9dbf8", dot: "#2563eb" },
-  confirmado: { label: "Confirmado", fg: "#8a5a1e", bg: "#f7edda", border: "#e8d3ac", dot: "#c9871f" },
-  entregado: { label: "Entregado", fg: "#2f6b3f", bg: "#e6f1e8", border: "#cfe4d3", dot: "#2f8f4e" },
-  cancelado: { label: "Cancelado", fg: "#a83422", bg: "#f8e7e3", border: "#efc7bd", dot: "#c0563f" },
+  nuevo: { label: "Nuevo", fg: "#3b6fe0", bg: "rgba(59,111,224,0.13)", border: "rgba(59,111,224,0.32)", dot: "#3b6fe0" },
+  confirmado: { label: "Confirmado", fg: "#c08427", bg: "rgba(201,135,31,0.15)", border: "rgba(201,135,31,0.34)", dot: "#c9871f" },
+  entregado: { label: "Entregado", fg: "#3f9a5c", bg: "rgba(47,143,78,0.14)", border: "rgba(47,143,78,0.32)", dot: "#2f8f4e" },
+  cancelado: { label: "Cancelado", fg: "#cf5f47", bg: "rgba(192,86,63,0.14)", border: "rgba(192,86,63,0.32)", dot: "#c0563f" },
 };
 
 export function statusOf(status: string): OrderStatus {

@@ -27,7 +27,7 @@ export default async function CategoriasPage() {
     return (
       <div className="space-y-4">
         <h1 className="font-display text-3xl text-cream">Categorías</h1>
-        <div className="rounded-2xl border border-[#e8d3ac] bg-[#f7edda] p-6 text-sm text-[#8a5a1e]">
+        <div className="rounded-2xl border border-accent/30 bg-accent/10 p-6 text-sm text-accent">
           <p className="font-semibold">Falta un paso de configuración (una sola vez).</p>
           <p className="mt-2">
             Para editar categorías desde acá, corré la migración{" "}

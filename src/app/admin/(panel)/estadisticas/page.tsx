@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { loadAdminData } from "@/lib/admin/data";
+import { AdminDataError } from "@/components/admin/data-error";
+import { PageHeader } from "@/components/admin/kit";
 import type { OrderRecord } from "@/lib/types/order";
 import { formatPrice } from "@/lib/utils";
 import { isActive, baseMenuItemId } from "@/lib/admin/orders";
@@ -22,33 +24,12 @@ const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 export default async function EstadisticasPage() {
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) {
-    return (
-      <div className="rounded-2xl border border-line bg-surface p-8">
-        <h1 className="font-display text-2xl text-cream">Estadísticas</h1>
-        <p className="mt-3 text-sm text-muted">Conectá Supabase para ver las estadísticas.</p>
-      </div>
-    );
-  }
+  const result = await loadAdminData();
+  if (!result.ok) return <AdminDataError title="Estadísticas" result={result} />;
 
-  const [{ data: ordersData }, { data: menuData }] = await Promise.all([
-    supabase.from("orders").select("*"),
-    supabase.from("menu_items").select("id, category, metadata"),
-  ]);
-
-  const orders = ((ordersData ?? []) as OrderRecord[]).filter(isActive);
-  const menuRows = (menuData ?? []) as {
-    id: string;
-    category: string;
-    metadata: Record<string, string> | null;
-  }[];
-  const catOf = new Map<string, string>(menuRows.map((m) => [m.id, m.category]));
-  const costOf = new Map<string, number>(
-    menuRows
-      .map((m) => [m.id, Number(m.metadata?.cost ?? 0)] as const)
-      .filter(([, c]) => c > 0)
-  );
+  const orders = result.orders.filter(isActive);
+  const catOf = new Map<string, string>(Object.entries(result.categoryMap));
+  const costOf = new Map<string, number>(Object.entries(result.costMap));
   const hasCosts = costOf.size > 0;
 
   // --- Facturación por mes (últimos 6) ---
@@ -121,12 +102,10 @@ export default async function EstadisticasPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-3xl text-cream">Estadísticas</h1>
-        <p className="mt-1 text-sm text-muted">
-          Basado en {orders.length} pedidos activos · {formatPrice(totalRevenue, "ARS")} facturados.
-        </p>
-      </div>
+      <PageHeader
+        title="Estadísticas"
+        description={`Basado en ${orders.length} pedidos activos · ${formatPrice(totalRevenue, "ARS")} facturados.`}
+      />
 
       {orders.length === 0 ? (
         <p className="rounded-2xl border border-line bg-surface p-10 text-center text-sm text-muted">
@@ -142,7 +121,7 @@ export default async function EstadisticasPage() {
             </p>
 
             {!hasCosts ? (
-              <div className="flex items-start gap-3 rounded-2xl border border-[#e8d3ac] bg-[#f7edda] p-5 text-sm text-[#8a5a1e]">
+              <div className="flex items-start gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-5 text-sm text-accent">
                 <Info className="mt-0.5 size-5 shrink-0" />
                 <p>
                   Todavía no cargaste el <strong>costo</strong> de ningún producto, así que no se puede
@@ -169,7 +148,7 @@ export default async function EstadisticasPage() {
                   label="Costo de mercadería"
                   value={formatPrice(totalCost, "ARS")}
                   caption="Lo que te costó producir/comprar"
-                  accent="#a83422"
+                  accent="var(--color-danger)"
                   tint="#f8e7e3"
                 />
                 <Kpi
@@ -229,10 +208,10 @@ export default async function EstadisticasPage() {
                         <td className="px-3 py-2.5 text-right tabular-nums text-primary/90">
                           {formatPrice(p.revenue, "ARS")}
                         </td>
-                        <td className="px-3 py-2.5 text-right tabular-nums text-[#a83422]">
+                        <td className="px-3 py-2.5 text-right tabular-nums text-danger">
                           {formatPrice(p.cost, "ARS")}
                         </td>
-                        <td className="px-3 py-2.5 text-right font-semibold tabular-nums text-[#2f6b3f]">
+                        <td className="px-3 py-2.5 text-right font-semibold tabular-nums text-success">
                           {formatPrice(p.profit, "ARS")}
                         </td>
                         <td className="py-2.5 pl-3 text-right tabular-nums text-muted">{p.margin}%</td>
@@ -303,7 +282,7 @@ function Kpi({
     <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
       <div
         className="flex size-10 items-center justify-center rounded-xl"
-        style={{ background: tint, color: accent }}
+        style={{ background: `${accent}1f`, color: accent }}
       >
         <Icon className="size-5" />
       </div>

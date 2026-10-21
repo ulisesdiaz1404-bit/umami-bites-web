@@ -1,46 +1,19 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { OrderRecord } from "@/lib/types/order";
-import { OrdersDashboard } from "@/components/admin/orders-dashboard";
+import { loadAdminData } from "@/lib/admin/data";
+import { computeOverview, TZ } from "@/lib/admin/analytics";
+import { OverviewView } from "@/components/admin/overview";
+import { AdminDataError } from "@/components/admin/data-error";
 
 export const dynamic = "force-dynamic";
 
-export default async function OrdersPage() {
-  const supabase = await createSupabaseServerClient();
+function greeting(): string {
+  const h = Number(new Date().toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: TZ }));
+  if (h >= 5 && h < 13) return "Buen día";
+  if (h >= 13 && h < 20) return "Buenas tardes";
+  return "Buenas noches";
+}
 
-  if (!supabase) {
-    return (
-      <div className="rounded-2xl border border-line bg-surface p-8">
-        <h1 className="font-display text-2xl text-cream">Pedidos</h1>
-        <p className="mt-3 text-sm text-muted">
-          Supabase no está configurado. Seguí los pasos de <code>SETUP-SUPABASE.md</code> para
-          conectar la base de datos y ver los pedidos acá.
-        </p>
-      </div>
-    );
-  }
-
-  const [{ data, error }, { data: menuData }] = await Promise.all([
-    supabase.from("orders").select("*").order("created_at", { ascending: false }),
-    supabase.from("menu_items").select("id, metadata"),
-  ]);
-
-  const orders = (data ?? []) as OrderRecord[];
-
-  // Mapa costo por ítem (centavos) desde metadata.cost, para calcular ganancia.
-  const costMap: Record<string, number> = {};
-  for (const m of (menuData ?? []) as { id: string; metadata: Record<string, string> | null }[]) {
-    const c = Number(m.metadata?.cost ?? 0);
-    if (c > 0) costMap[m.id] = c;
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-danger/40 bg-danger/10 p-8">
-        <h1 className="font-display text-2xl text-cream">Pedidos</h1>
-        <p className="mt-3 text-sm text-danger">{error.message}</p>
-      </div>
-    );
-  }
-
-  return <OrdersDashboard orders={orders} costMap={costMap} />;
+export default async function ResumenPage() {
+  const data = await loadAdminData();
+  if (!data.ok) return <AdminDataError title="Resumen" result={data} />;
+  return <OverviewView data={computeOverview(data.orders, data.costMap)} greeting={greeting()} />;
 }

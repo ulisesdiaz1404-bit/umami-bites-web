@@ -18,9 +18,12 @@ import {
   StickyNote,
   Trash2,
   Star,
+  History,
   type LucideIcon,
 } from "lucide-react";
 import type { OrderRecord } from "@/lib/types/order";
+import { PageHeader, Stagger, StatCard } from "@/components/admin/kit";
+import { dayKey } from "@/lib/admin/analytics";
 import { formatPrice, formatUnit } from "@/lib/utils";
 import { PAYMENT_LABELS, buildReviewHref } from "@/lib/whatsapp-order";
 import {
@@ -42,11 +45,13 @@ type Filter = "todos" | OrderStatus;
 export function OrdersDashboard({
   orders,
   costMap = {},
+  initialFilter = "todos",
 }: {
   orders: OrderRecord[];
   costMap?: Record<string, number>;
+  initialFilter?: Filter;
 }) {
-  const [filter, setFilter] = useState<Filter>("todos");
+  const [filter, setFilter] = useState<Filter>(initialFilter);
 
   const metrics = useMemo(() => {
     const active = orders.filter((o) => statusOf(o.status) !== "cancelado");
@@ -84,77 +89,63 @@ export function OrdersDashboard({
     };
   }, [orders, costMap]);
 
-  const filtered = useMemo(
-    () => (filter === "todos" ? orders : orders.filter((o) => statusOf(o.status) === filter)),
-    [orders, filter]
+  // Entregados "viejos": se ocultan de la lista para que quede solo lo que hay que
+  // atender, pero NO se borran (siguen contando en métricas, estadísticas y clientes).
+  // No se guarda la hora de entrega, así que se usa la fecha de entrega: se ocultan
+  // desde el día siguiente. Sin fecha, 24 h después de creado el pedido.
+  const [showArchived, setShowArchived] = useState(false);
+  const archived = useMemo(() => {
+    const today = dayKey(new Date());
+    const cutoff = Date.now() - 24 * 3_600_000;
+    return new Set(
+      orders
+        .filter(
+          (o) =>
+            statusOf(o.status) === "entregado" &&
+            (o.delivery_date ? o.delivery_date < today : Date.parse(o.created_at) < cutoff)
+        )
+        .map((o) => o.id)
+    );
+  }, [orders]);
+  const visible = useMemo(
+    () => (showArchived ? orders : orders.filter((o) => !archived.has(o.id))),
+    [orders, archived, showArchived]
   );
 
+  const filtered = useMemo(
+    () => (filter === "todos" ? visible : visible.filter((o) => statusOf(o.status) === filter)),
+    [visible, filter]
+  );
+
+  const countOf = (st: OrderStatus) => visible.filter((o) => statusOf(o.status) === st).length;
   const counts: Record<Filter, number> = {
-    todos: orders.length,
-    nuevo: metrics.nuevos,
-    confirmado: orders.filter((o) => statusOf(o.status) === "confirmado").length,
-    entregado: metrics.entregados,
-    cancelado: metrics.cancelados,
+    todos: visible.length,
+    nuevo: countOf("nuevo"),
+    confirmado: countOf("confirmado"),
+    entregado: countOf("entregado"),
+    cancelado: countOf("cancelado"),
   };
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-3xl text-cream">Pedidos</h1>
-        <p className="mt-1 text-sm text-muted">
-          Facturación y estado de cada pedido. La cancelación no cuenta en los ingresos.
-        </p>
-      </div>
+      <PageHeader
+        title="Pedidos"
+        description="Facturación y estado de cada pedido. Los cancelados no cuentan en los ingresos."
+      />
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <Stagger className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         {metrics.hasCosts && (
-          <Kpi
-            icon={TrendingUp}
-            label="Ganancia estimada"
-            value={formatPrice(metrics.profit, "ARS")}
-            accent="#2f8f4e"
-            tint="#e6f1e8"
-          />
+          <StatCard icon={TrendingUp} label="Ganancia estimada" value={metrics.profit} format="money" />
         )}
-        <Kpi
-          icon={Wallet}
-          label="Facturado (activos)"
-          value={formatPrice(metrics.revenue, "ARS")}
-          accent="#2563eb"
-          tint="#e9effc"
-        />
+        <StatCard icon={Wallet} label="Facturado (activos)" value={metrics.revenue} format="money" />
         {metrics.hasCosts && (
-          <Kpi
-            icon={Coins}
-            label="Costo de mercadería"
-            value={formatPrice(metrics.cost, "ARS")}
-            accent="#a83422"
-            tint="#f8e7e3"
-          />
+          <StatCard icon={Coins} label="Costo de mercadería" value={metrics.cost} format="money" />
         )}
-        <Kpi
-          icon={CalendarDays}
-          label="Este mes"
-          value={formatPrice(metrics.monthRevenue, "ARS")}
-          accent="#0d9488"
-          tint="#e2f3f1"
-        />
-        <Kpi
-          icon={Receipt}
-          label="Ticket promedio"
-          value={formatPrice(metrics.avgTicket, "ARS")}
-          accent="#7c3aed"
-          tint="#efe9fb"
-        />
-        <Kpi
-          icon={ShoppingBag}
-          label="Pedidos activos"
-          value={String(metrics.activeCount)}
-          accent="#c9871f"
-          tint="#f7edda"
-        />
-      </div>
+        <StatCard icon={CalendarDays} label="Este mes" value={metrics.monthRevenue} format="money" />
+        <StatCard icon={Receipt} label="Ticket promedio" value={metrics.avgTicket} format="money" />
+        <StatCard icon={ShoppingBag} label="Pedidos activos" value={metrics.activeCount} format="number" />
+      </Stagger>
 
       {/* Filtros por estado + limpieza de entregados */}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -167,12 +158,10 @@ export function OrdersDashboard({
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className="rounded-full border px-4 py-1.5 text-xs font-medium capitalize transition-colors"
-              style={{
-                background: isActive ? (meta?.dot ?? "#4a361f") : "#fdf9f2",
-                color: isActive ? "#fff" : "#6b5236",
-                borderColor: isActive ? (meta?.dot ?? "#4a361f") : "rgba(74,54,31,0.18)",
-              }}
+              className={`rounded-full border px-4 py-1.5 text-xs font-medium capitalize transition-colors ${
+                isActive ? "text-white" : "border-line bg-surface text-muted hover:text-cream"
+              }`}
+              style={isActive ? { background: meta?.dot ?? "var(--color-accent)", borderColor: meta?.dot ?? "var(--color-accent)" } : undefined}
             >
               {f === "todos" ? "Todos" : meta?.label} ({counts[f]})
             </button>
@@ -193,36 +182,28 @@ export function OrdersDashboard({
           ))}
         </div>
       )}
+
+      {archived.size > 0 && (filter === "todos" || filter === "entregado") && (
+        <div className="flex flex-col items-center gap-2 border-t border-line pt-6 text-center">
+          <p className="text-xs text-muted">
+            {showArchived
+              ? "Mostrando también los entregados anteriores."
+              : `${archived.size} ${archived.size === 1 ? "pedido entregado se ocultó" : "pedidos entregados se ocultaron"} de la lista (pasaron más de 24 h). Siguen contando en las métricas.`}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowArchived((v) => !v)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-surface-2"
+          >
+            <History className="size-4" />
+            {showArchived ? "Ocultar entregados anteriores" : `Ver entregados anteriores (${archived.size})`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-function Kpi({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  tint,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  accent: string;
-  tint: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-line bg-surface p-5 shadow-card">
-      <div
-        className="flex size-10 items-center justify-center rounded-xl"
-        style={{ background: tint, color: accent }}
-      >
-        <Icon className="size-5" />
-      </div>
-      <p className="mt-4 text-2xl font-semibold tabular-nums text-cream">{value}</p>
-      <p className="mt-0.5 text-xs uppercase tracking-wide text-muted">{label}</p>
-    </div>
-  );
-}
 
 function OrderCard({ order }: { order: OrderRecord }) {
   const router = useRouter();
@@ -354,14 +335,14 @@ function OrderCard({ order }: { order: OrderRecord }) {
           )}
           {status === "entregado" && (
             <>
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2f6b3f]">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
                 <CheckCircle2 className="size-4" /> Pedido entregado
               </span>
               <a
                 href={buildReviewHref(order.customer_phone, order.customer_name)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#c9871f]/50 px-4 py-2 text-xs font-semibold text-[#8a5a1e] transition-colors hover:bg-[#c9871f]/10"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#c9871f]/50 px-4 py-2 text-xs font-semibold text-accent transition-colors hover:bg-[#c9871f]/10"
               >
                 <Star className="size-4" /> Pedir reseña
               </a>
@@ -408,7 +389,7 @@ function BulkDeleteDelivered({ count }: { count: number }) {
         }
       }}
       disabled={pending}
-      className="inline-flex items-center gap-1.5 rounded-full border border-[#c0563f]/40 px-3.5 py-1.5 text-xs font-medium text-[#a83422] transition-colors hover:bg-[#c0563f]/10 disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 rounded-full border border-[#c0563f]/40 px-3.5 py-1.5 text-xs font-medium text-danger transition-colors hover:bg-[#c0563f]/10 disabled:opacity-50"
     >
       <Trash2 className="size-3.5" /> {pending ? "Borrando…" : `Borrar entregados (${count})`}
     </button>
@@ -429,7 +410,7 @@ function ActionBtn({
   const tones: Record<string, string> = {
     primary: "bg-[#2563eb] text-white hover:bg-[#1e51c9]",
     success: "bg-[#2f8f4e] text-white hover:bg-[#277a43]",
-    danger: "border border-[#c0563f]/50 text-[#a83422] hover:bg-[#c0563f]/10",
+    danger: "border border-[#c0563f]/50 text-danger hover:bg-[#c0563f]/10",
     neutral: "border border-line text-primary hover:bg-surface-2",
   };
   return (

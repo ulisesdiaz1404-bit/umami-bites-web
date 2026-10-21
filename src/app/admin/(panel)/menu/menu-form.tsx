@@ -243,7 +243,7 @@ export function MenuForm({
                         type="button"
                         onClick={() => removeImage(i)}
                         title="Quitar foto"
-                        className="rounded-full bg-white/90 p-1 text-[#a83422] hover:bg-white"
+                        className="rounded-full bg-white/90 p-1 text-danger hover:bg-white"
                       >
                         <X className="size-3.5" />
                       </button>
@@ -265,7 +265,7 @@ export function MenuForm({
                         type="button"
                         onClick={() => removePending(i)}
                         title="Quitar foto"
-                        className="rounded-full bg-white/90 p-1 text-[#a83422] hover:bg-white"
+                        className="rounded-full bg-white/90 p-1 text-danger hover:bg-white"
                       >
                         <X className="size-3.5" />
                       </button>
@@ -407,7 +407,7 @@ export function MenuForm({
                   type="button"
                   onClick={() => setVariants((prev) => prev.filter((_, j) => j !== i))}
                   title="Quitar opción"
-                  className="rounded-full p-2 text-[#a83422] hover:bg-[#f8e7e3]"
+                  className="rounded-full p-2 text-danger hover:bg-danger/10"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -429,7 +429,7 @@ export function MenuForm({
               borderColor: v.available ? "#cfe4d3" : "#efc7bd",
             }}
           >
-            <span className="text-sm font-medium" style={{ color: v.available ? "#2f6b3f" : "#a83422" }}>
+            <span className="text-sm font-medium" style={{ color: v.available ? "var(--color-success)" : "var(--color-danger)" }}>
               {v.available ? "Disponible en la web" : "Oculto / no disponible"}
             </span>
             <input
@@ -559,7 +559,7 @@ function MarginHint({ price, cost }: { price: string; cost: string }) {
       className="flex items-center justify-between rounded-base px-4 py-2.5 text-sm"
       style={{
         background: positive ? "#e6f1e8" : "#f8e7e3",
-        color: positive ? "#2f6b3f" : "#a83422",
+        color: positive ? "var(--color-success)" : "var(--color-danger)",
       }}
     >
       <span className="font-medium">Ganancia por unidad</span>

@@ -29,7 +29,7 @@ export async function updateOrderStatus(
   const { error } = await supabase.from("orders").update({ status }).eq("id", id);
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true };
 }
 
@@ -42,7 +42,7 @@ export async function deleteOrder(id: string): Promise<OrderActionResult> {
   const { error } = await admin.from("orders").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true };
 }
 
@@ -55,6 +55,6 @@ export async function deleteDeliveredOrders(): Promise<OrderActionResult> {
   const { error } = await admin.from("orders").delete().eq("status", "entregado");
   if (error) return { ok: false, error: error.message };
 
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
   return { ok: true };
 }
