@@ -70,7 +70,7 @@ export function PurchasePanel({ item }: { item: MenuItem }) {
       {/* Selector de opción */}
       {variants && (
         <div className="mt-5">
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-accent">Elegí tu opción</p>
+          <p className="text-sm font-medium text-accent">Elegí tu opción</p>
           <div className="mt-2.5 flex flex-wrap gap-2.5">
             {variants.map((v, i) => {
               const selected = i === variantIdx;

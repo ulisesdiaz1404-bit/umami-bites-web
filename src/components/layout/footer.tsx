@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram, Phone, MapPin, Clock } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { WaCta } from "@/components/analytics/wa-cta";
@@ -11,7 +12,14 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
   const waHref = whatsappHref(settings.whatsapp);
   return (
     <footer className="relative overflow-hidden border-t border-line bg-bg-deep">
-      <div className="grain absolute inset-0" />
+      {/* Nombre de marca gigante en gris, detrás de todo el contenido */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-[-0.18em] select-none text-center font-display text-[30vw] font-semibold leading-none tracking-[-0.04em] text-primary/[0.06] lg:text-[24vw]"
+      >
+        UMAMI
+      </span>
+
       <div className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
           <div className="space-y-5">
@@ -42,7 +50,7 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-xs font-medium uppercase tracking-[0.24em] text-accent">Navegación</h4>
+            <h4 className="font-display text-lg text-cream">Navegación</h4>
             <ul className="space-y-2.5 text-sm text-primary/85">
               <li><Link href="/" className="transition-colors hover:text-cream">Inicio</Link></li>
               <li><Link href="/menu" className="transition-colors hover:text-cream">Servicios</Link></li>
@@ -53,7 +61,7 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-xs font-medium uppercase tracking-[0.24em] text-accent">Eventos</h4>
+            <h4 className="font-display text-lg text-cream">Eventos</h4>
             <ul className="space-y-2.5 text-sm text-muted">
               {EVENTS.map((e) => (
                 <li key={e}>{e}</li>
@@ -86,14 +94,22 @@ export function Footer({ settings = DEFAULT_SETTINGS }: { settings?: BusinessSet
           </div>
         </div>
 
-        <div className="mt-6 border-t border-line/60 pt-5 text-center">
+        <div className="mt-6 flex justify-center border-t border-line/60 pt-5 pb-[8vw] lg:pb-[6vw]">
           <a
             href="https://ulises-studio-web.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] font-medium uppercase tracking-[0.28em] text-muted/70 underline-offset-4 transition-colors hover:text-accent hover:underline"
+            className="group inline-flex items-center gap-2 text-xs text-muted transition-colors hover:text-cream"
           >
-            Ulises Studio
+            Sitio hecho por
+            <Image
+              src="/ulises-studio-mark.png"
+              alt=""
+              width={20}
+              height={20}
+              className="size-5 transition-transform duration-300 group-hover:-rotate-6"
+            />
+            <span className="font-semibold tracking-wide text-primary group-hover:text-cream">Ulises Studio</span>
           </a>
         </div>
       </div>

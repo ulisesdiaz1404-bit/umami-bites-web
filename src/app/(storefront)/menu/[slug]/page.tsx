@@ -102,7 +102,7 @@ export default async function ItemDetailPage({
 
           {item.includes && item.includes.length > 0 && (
             <div className="mt-7">
-              <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
+              <h2 className="font-display text-lg text-cream">
                 Qué incluye
               </h2>
               <ul className="mt-3 space-y-2">

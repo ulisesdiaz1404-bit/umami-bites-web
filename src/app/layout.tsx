@@ -6,11 +6,12 @@ import { Providers } from "@/components/providers";
 import { JsonLd } from "@/components/seo/json-ld";
 import { catererSchema } from "@/lib/seo/schema";
 import { SITE_URL } from "@/lib/site";
+import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   variable: "--font-playfair",
   display: "swap",
@@ -18,7 +19,7 @@ const playfair = Playfair_Display({
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
   variable: "--font-dm-sans",
   display: "swap",
 });
@@ -62,7 +63,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${playfair.variable} ${dmSans.variable}`}>
+    <html lang="es" className={`${playfair.variable} ${dmSans.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="bg-bg text-primary antialiased">
         <JsonLd data={catererSchema()} />
         <Providers>{children}</Providers>

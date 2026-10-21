@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
@@ -33,10 +34,7 @@ export function Header() {
   useEffect(() => setMobileOpen(false), [pathname]);
 
   return (
-    <motion.header
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: [0.22, 0.8, 0.2, 1] }}
+    <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 backdrop-blur-xl transition-all duration-500",
         scrolled
@@ -73,7 +71,8 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <ThemeToggle />
           <button
             type="button"
             onClick={openCart}
@@ -136,6 +135,6 @@ export function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

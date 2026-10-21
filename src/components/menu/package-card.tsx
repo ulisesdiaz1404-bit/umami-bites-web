@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronDown, Sparkles, Users } from "lucide-react";
+import { Check, ChevronDown, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AddToCartButton } from "@/components/menu/add-to-cart-button";
 import { cn, formatPrice } from "@/lib/utils";
@@ -34,7 +34,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 280, damping: 24 }}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border bg-surface shadow-card transition-shadow hover:shadow-soft",
+        "group relative flex h-full flex-col overflow-hidden rounded-xl border bg-surface shadow-card transition-shadow hover:shadow-soft",
         featured || isSpecialty ? "border-accent/40" : "border-line",
         !item.available && "opacity-80"
       )}
@@ -57,9 +57,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
           <Badge variant="soft">Paquete</Badge>
           {isSpecialty && (
-            <Badge variant="default" className="gap-1">
-              <Sparkles className="size-3" /> Especialidad
-            </Badge>
+            <Badge variant="default">Especialidad</Badge>
           )}
         </div>
         {!item.available && (
@@ -89,7 +87,7 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
-              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.14em] text-accent transition-colors hover:text-cream"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-cream"
             >
               ¿Qué incluye?
               <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} />
@@ -116,7 +114,9 @@ export function PackageCard({ item, featured = false }: { item: MenuItem; featur
           </div>
         )}
 
-        <div className="mt-5 flex items-end justify-between gap-3 border-t border-line pt-4">
+        {/* Separador flexible: empuja precio y botón al fondo de la card */}
+        <div className="min-h-5 flex-1" />
+        <div className="flex items-end justify-between gap-3 border-t border-line pt-4">
           <div>
             <div>
               <span className="price text-2xl">

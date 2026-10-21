@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Modo oscuro por clase (`html.dark`), no por media query: lo controla el toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* =====================================================================
    UMAMI BITES CATERING · SISTEMA VISUAL
    Dirección estética: minimalista orgánico premium.
@@ -48,6 +51,27 @@
   --shadow-glow: 0 0 0 1px rgba(176, 122, 60, 0.28), 0 18px 46px -26px rgba(176, 122, 60, 0.45);
 }
 
+/* --- Modo oscuro: misma paleta cálida, invertida (madera / espresso) --- */
+html.dark {
+  color-scheme: dark;
+  --color-bg: #16100a;
+  --color-bg-deep: #1c140d;
+  --color-surface: #231a11;
+  --color-surface-2: #2d2217;
+  --color-canvas: #16100a;
+  --color-primary: #e8dac3;
+  --color-accent: #cf9a5a;
+  --color-accent-deep: #b9844a;
+  --color-on-accent: #1a1209;
+  --color-muted: #b5a084;
+  --color-cream: #f7eddd;
+  --color-line: rgba(232, 218, 195, 0.12);
+  --color-line-strong: rgba(232, 218, 195, 0.22);
+  --shadow-soft: 0 22px 55px -28px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 14px 36px -22px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 0 1px rgba(207, 154, 90, 0.3), 0 18px 46px -26px rgba(0, 0, 0, 0.6);
+}
+
 * {
   border-color: var(--color-line);
 }
@@ -71,6 +95,7 @@ h1, h2, h3, h4 {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.08;
+  text-wrap: balance;
   color: var(--color-cream);
 }
 
@@ -109,29 +134,16 @@ h1, h2, h3, h4 {
   line-height: 1;
 }
 
-/* Eyebrow / kicker de sección */
+/* Kicker de sección: serif itálica chica, sin rayitas ni mayúsculas espaciadas */
 .eyebrow {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.3;
   color: var(--color-accent);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-.eyebrow::before {
-  content: "";
-  width: 28px;
-  height: 1px;
-  background: var(--color-accent);
-}
-.eyebrow.is-centered::after {
-  content: "";
-  width: 28px;
-  height: 1px;
-  background: var(--color-accent);
+  display: inline-block;
 }
 
 /* Grano sutil para fondos con profundidad */
@@ -144,23 +156,15 @@ h1, h2, h3, h4 {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
 }
 
-/* Glass — botones y tarjetas translúcidas sobre el hero */
+/* Translúcido para el botón secundario sobre la foto del hero */
 .glass {
-  background: rgba(250, 243, 235, 0.08);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid rgba(250, 243, 235, 0.18);
+  background: rgba(250, 243, 235, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(250, 243, 235, 0.3);
 }
 
-/* Texto con degradado dorado para titulares destacados */
-.text-gold-gradient {
-  background: linear-gradient(100deg, var(--color-primary) 0%, var(--color-accent) 45%, var(--color-cream) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Skeleton pulse para loading states (paleta oscura) */
+/* Skeleton pulse para loading states */
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
@@ -172,31 +176,12 @@ h1, h2, h3, h4 {
   border-radius: var(--radius-base);
 }
 
-/* Brillo que recorre (shimmer) para acentos del hero */
-@keyframes shimmer {
-  0% { background-position: -120% 0; }
-  100% { background-position: 220% 0; }
+/* Entrada suave del contenido del hero (CSS puro: sin JS en el primer render) */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
 }
-
-/* Flotación suave para elementos decorativos del hero */
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-14px) rotate(2deg); }
-}
-.float-slow { animation: float-slow 7s ease-in-out infinite; }
-
-@keyframes float-slower {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-22px) rotate(-3deg); }
-}
-.float-slower { animation: float-slower 10s ease-in-out infinite; }
-
-/* Rotación lenta del anillo botánico (eco del isologo) */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.spin-slow { animation: spin-slow 60s linear infinite; }
+.rise { animation: rise 0.8s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
   *,

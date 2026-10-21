@@ -14,8 +14,8 @@ export async function PackagesSection() {
       <div className="relative mx-auto max-w-7xl px-5 py-28 lg:px-8">
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
-            <span className="eyebrow is-centered justify-center">Eventos sin estrés</span>
-            <h2 className="mt-5 font-display text-4xl text-cream sm:text-5xl lg:text-6xl">
+            <span className="eyebrow">Eventos sin estrés</span>
+            <h2 className="mt-3 font-display text-4xl text-cream sm:text-5xl lg:text-6xl">
               Nuestros <span className="accent-serif">menús completos</span>
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-primary/85">
@@ -27,7 +27,7 @@ export async function PackagesSection() {
 
         <RevealGroup className="mt-16 grid gap-7 md:grid-cols-2" stagger={0.14}>
           {packages.map((pkg, i) => (
-            <RevealItem key={pkg.id}>
+            <RevealItem key={pkg.id} className="h-full">
               <PackageCard item={pkg} featured={i === 0} />
             </RevealItem>
           ))}

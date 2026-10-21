@@ -9,12 +9,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-accent text-on-accent shadow-card hover:bg-accent-deep hover:-translate-y-0.5 hover:shadow-glow",
+          "bg-accent text-on-accent shadow-card hover:bg-accent-deep active:scale-[0.98]",
         outline:
-          "border border-accent/55 text-primary hover:bg-accent hover:text-on-accent hover:-translate-y-0.5",
+          "border border-accent/55 text-primary hover:bg-accent hover:text-on-accent active:scale-[0.98]",
         ghost: "text-primary hover:bg-surface-2",
         secondary: "bg-surface text-primary hover:bg-surface-2",
-        glass: "glass text-on-accent hover:bg-white/20 hover:-translate-y-0.5",
+        glass: "glass text-[#fbf6ee] hover:bg-white/20 active:scale-[0.98]",
         link: "text-accent underline-offset-4 hover:underline",
       },
       size: {

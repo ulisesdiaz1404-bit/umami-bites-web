@@ -67,6 +67,10 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // AVIF/WebP: fotos bastante más livianas que JPG con la misma calidad visual.
+    formats: ["image/avif", "image/webp"],
+    // Las fotos no cambian seguido: cache de 30 días en el optimizador.
+    minimumCacheTTL: 2592000,
     qualities: [75, 90],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

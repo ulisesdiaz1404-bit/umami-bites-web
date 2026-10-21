@@ -14,7 +14,7 @@ export async function FeaturedDishes() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <span className="eyebrow">Para picar y compartir</span>
-            <h2 className="mt-5 max-w-xl font-display text-3xl text-cream sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 max-w-xl font-display text-3xl text-cream sm:text-4xl lg:text-5xl">
               Picadas y <span className="accent-serif">complementos</span>
             </h2>
           </div>
@@ -31,7 +31,7 @@ export async function FeaturedDishes() {
         stagger={0.12}
       >
         {dishes.map((dish) => (
-          <RevealItem key={dish.id}>
+          <RevealItem key={dish.id} className="h-full">
             <MenuItemCard item={dish} />
           </RevealItem>
         ))}

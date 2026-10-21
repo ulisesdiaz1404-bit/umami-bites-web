@@ -18,7 +18,7 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 280, damping: 24 }}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-card transition-shadow hover:shadow-soft",
+        "group flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-card transition-shadow hover:shadow-soft",
         !item.available && "opacity-80"
       )}
     >
@@ -52,7 +52,9 @@ export function MenuItemCard({ item }: { item: MenuItem }) {
         </Link>
         <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-primary/90">{item.description}</p>
 
-        <div className="mt-4 flex items-end justify-between gap-3 pt-2">
+        {/* Separador flexible: precio y botón siempre alineados abajo, aunque el título ocupe 2 líneas */}
+        <div className="min-h-4 flex-1" />
+        <div className="flex items-end justify-between gap-3 pt-2">
           <div>
             <span className="price text-xl">
               {formatPrice(displayPriceInCents(item), item.currency)}

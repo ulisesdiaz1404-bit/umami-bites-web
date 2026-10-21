@@ -28,7 +28,7 @@ export function Logo({ className, mark = 48, priority = false }: LogoProps) {
         width={width}
         height={height}
         priority={priority}
-        className="shrink-0 object-contain"
+        className="shrink-0 object-contain dark:invert"
         style={{ height, width }}
       />
     </span>
