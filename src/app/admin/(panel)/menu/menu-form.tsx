@@ -331,7 +331,9 @@ export function MenuForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cost">Costo (ARS)</Label>
+              <Label htmlFor="cost">
+                Costo {item?.metadata?.unit ? `por ${item.metadata.unit}` : "por unidad"} (ARS)
+              </Label>
               <Input
                 id="cost"
                 name="cost"
@@ -345,7 +347,7 @@ export function MenuForm({
             </div>
           </div>
 
-          <MarginHint price={v.price} cost={v.cost} />
+          <MarginHint price={v.price} cost={v.cost} unit={item?.metadata?.unit} />
 
           <div className="space-y-1.5">
             <Label htmlFor="maxQuantity">Máx. por pedido</Label>
@@ -547,25 +549,35 @@ export function MenuForm({
   );
 }
 
-function MarginHint({ price, cost }: { price: string; cost: string }) {
+function MarginHint({ price, cost, unit }: { price: string; cost: string; unit?: string }) {
   const p = Number(price) || 0;
   const c = Number(cost) || 0;
   if (p <= 0 || c <= 0) return null;
   const profit = p - c;
   const margin = Math.round((profit / p) * 100);
   const positive = profit >= 0;
+  const per = unit ?? "unidad";
   return (
     <div
-      className="flex items-center justify-between rounded-base px-4 py-2.5 text-sm"
+      className="rounded-base px-4 py-2.5 text-sm"
       style={{
         background: positive ? "#e6f1e8" : "#f8e7e3",
         color: positive ? "var(--color-success)" : "var(--color-danger)",
       }}
     >
-      <span className="font-medium">Ganancia por unidad</span>
-      <span className="font-semibold tabular-nums">
-        {formatPrice(Math.round(profit * 100), "ARS")} ({margin}%)
-      </span>
+      <div className="flex items-center justify-between">
+        <span className="font-medium">Ganancia por {per}</span>
+        <span className="font-semibold tabular-nums">
+          {formatPrice(Math.round(profit * 100), "ARS")} ({margin}%)
+        </span>
+      </div>
+      {/* Error típico: cargar el costo del pedido entero en vez del de 1 persona/unidad. */}
+      {!positive && (
+        <p className="mt-1 text-xs">
+          El costo es mayor que el precio. Se multiplica por la cantidad pedida, así que tiene que
+          ser lo que te cuesta 1 {per}, no el pedido completo.
+        </p>
+      )}
     </div>
   );
 }

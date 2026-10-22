@@ -289,6 +289,23 @@ export function computeAlerts(
       href: "/admin/pedidos",
     });
 
+  // Costo cargado mayor que el precio de venta: casi siempre es el costo del
+  // pedido entero cargado como costo por persona/unidad, y hunde la ganancia.
+  const overCost = new Map<string, string>();
+  for (const o of all.filter(isActive))
+    for (const it of o.items) {
+      const c = costMap[baseId(it.menuItemId)];
+      if (c && it.priceInCents > 0 && c > it.priceInCents) overCost.set(baseId(it.menuItemId), it.name);
+    }
+  if (overCost.size)
+    alerts.push({
+      id: "overcost",
+      tone: "danger",
+      title: `${plural(overCost.size, "producto tiene", "productos tienen")} el costo más alto que el precio`,
+      detail: `${[...overCost.values()].join(", ")}. El costo va por persona/unidad (se multiplica por la cantidad): revisalo en el menú, si no la ganancia sale negativa.`,
+      href: "/admin/menu",
+    });
+
   const soldIds = new Set(all.filter(isActive).flatMap((o) => o.items.map((it) => baseId(it.menuItemId))));
   const missingCost = [...soldIds].filter((id) => !costMap[id]).length;
   if (missingCost)
