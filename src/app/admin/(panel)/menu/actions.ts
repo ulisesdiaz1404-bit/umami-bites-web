@@ -2,40 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createServiceRoleClient } from "@/lib/supabase/admin-client";
+import { uploadPublicImage } from "@/lib/supabase/storage";
 
 const IMAGE_BUCKET = "menu-images";
 
-/**
- * Sube una foto del menú a Supabase Storage y devuelve su URL pública.
- * Usa service role (server-only) y crea el bucket público si no existe, así el
- * dueño puede cambiar fotos desde el panel sin tocar código ni redeploy.
- */
-async function uploadMenuImage(
-  file: File,
-  slug: string
-): Promise<{ url?: string; error?: string }> {
-  const admin = createServiceRoleClient();
-  if (!admin) {
-    return { error: "Para subir fotos falta configurar SUPABASE_SERVICE_ROLE_KEY." };
-  }
-  // Idempotente: si el bucket ya existe, devuelve error que ignoramos.
-  await admin.storage.createBucket(IMAGE_BUCKET, {
-    public: true,
-    fileSizeLimit: "8MB",
-  });
-
-  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-  // Sufijo aleatorio: varias fotos subidas en el mismo ms no se pisan entre sí.
-  const path = `${slug || "item"}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await admin.storage.from(IMAGE_BUCKET).upload(path, file, {
-    contentType: file.type || "image/jpeg",
-    upsert: true,
-  });
-  if (error) return { error: `No se pudo subir la foto: ${error.message}` };
-
-  const { data } = admin.storage.from(IMAGE_BUCKET).getPublicUrl(path);
-  return { url: data.publicUrl };
+/** Sube una foto del menú a Supabase Storage y devuelve su URL pública. */
+function uploadMenuImage(file: File, slug: string) {
+  return uploadPublicImage(IMAGE_BUCKET, file, slug || "item");
 }
 
 export interface MenuFormState {

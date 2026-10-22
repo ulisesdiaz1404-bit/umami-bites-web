@@ -18,6 +18,10 @@ interface SettingsRow {
   address: string | null;
   hours: string | null;
   shipping_in_cents: number | null;
+  // Columnas de la migración 0004 (pueden no existir todavía).
+  shipping_per_km_in_cents?: number | null;
+  origin_lat?: number | null;
+  origin_lng?: number | null;
   min_order_in_cents: number | null;
 }
 
@@ -38,6 +42,9 @@ export async function getSettings(): Promise<BusinessSettings> {
     address: r.address ?? d.address,
     hours: r.hours ?? d.hours,
     shippingInCents: r.shipping_in_cents ?? d.shippingInCents,
+    shippingPerKmInCents: r.shipping_per_km_in_cents ?? d.shippingPerKmInCents,
+    originLat: r.origin_lat ?? d.originLat,
+    originLng: r.origin_lng ?? d.originLng,
     minOrderInCents: r.min_order_in_cents ?? d.minOrderInCents,
   };
 }

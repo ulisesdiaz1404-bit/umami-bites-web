@@ -41,10 +41,11 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   // No filtra la URL completa al navegar a otros sitios.
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Apaga APIs sensibles del navegador que el sitio no usa.
+  // Apaga APIs sensibles del navegador que el sitio no usa. La ubicación queda
+  // habilitada solo para el propio sitio (botón "Usar mi ubicación" del checkout).
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), interest-cohort=(), browsing-topics=()",
+    value: "camera=(), microphone=(), geolocation=(self), interest-cohort=(), browsing-topics=()",
   },
   { key: "X-DNS-Prefetch-Control", value: "on" },
   // Aísla el origen (Spectre / fugas cross-origin).

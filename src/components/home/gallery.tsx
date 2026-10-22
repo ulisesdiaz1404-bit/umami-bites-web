@@ -3,13 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-
-export interface GalleryPhoto {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-}
+import type { GalleryPhoto } from "@/lib/data/gallery";
 
 /** Mosaico de fotos + visor a pantalla completa (<dialog> nativo: Esc, foco y scroll-lock gratis). */
 export function Gallery({ photos }: { photos: readonly GalleryPhoto[] }) {

@@ -35,7 +35,17 @@ export function SettingsForm({ settings }: { settings: BusinessSettings }) {
           />
           <Field icon={Phone} id="phonePrimary" label="Teléfono 1" defaultValue={settings.phonePrimary} />
           <Field icon={Phone} id="phoneSecondary" label="Teléfono 2" defaultValue={settings.phoneSecondary} />
-          <Field icon={MapPin} id="address" label="Dirección" defaultValue={settings.address} />
+          <Field
+            icon={MapPin}
+            id="address"
+            label="Dirección del local"
+            defaultValue={settings.address}
+            hint={
+              settings.originLat != null
+                ? "✓ Ubicada en el mapa. Desde acá se miden los km del envío."
+                : "Calle, número y localidad. Desde acá se miden los km del envío."
+            }
+          />
           <Field
             icon={Clock}
             id="hours"
@@ -49,14 +59,22 @@ export function SettingsForm({ settings }: { settings: BusinessSettings }) {
       {/* Checkout */}
       <section className="space-y-4 rounded-2xl border border-line bg-surface p-6">
         <SectionTitle color="#2563eb">Checkout (afecta los totales)</SectionTitle>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Field
+            icon={Truck}
+            id="shippingPerKm"
+            label="Envío por km (ARS)"
+            type="number"
+            defaultValue={String(settings.shippingPerKmInCents / 100)}
+            hint="Se multiplica por los km desde el local hasta la dirección del cliente"
+          />
           <Field
             icon={Truck}
             id="shipping"
-            label="Costo de envío (ARS)"
+            label="Envío mínimo (ARS)"
             type="number"
             defaultValue={String(settings.shippingInCents / 100)}
-            hint="Se suma al total cuando hay ítems en el carrito"
+            hint="Lo menos que se cobra por un envío, aunque quede muy cerca. 0 = sin mínimo"
           />
           <Field
             icon={ShoppingCart}
@@ -77,6 +95,16 @@ export function SettingsForm({ settings }: { settings: BusinessSettings }) {
       {state.ok && (
         <p className="rounded-base border border-success/40 bg-success/10 px-4 py-3 text-sm text-success">
           Guardado ✓ — los cambios ya se ven en la web.
+          {state.matched && (
+            <span className="mt-1 block text-xs opacity-80">
+              Local ubicado en: {state.matched}
+            </span>
+          )}
+        </p>
+      )}
+      {state.warning && (
+        <p className="rounded-base border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent">
+          {state.warning}
         </p>
       )}
 

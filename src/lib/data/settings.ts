@@ -11,7 +11,13 @@ export interface BusinessSettings {
   phoneSecondary: string;
   address: string;
   hours: string;
+  /** Envío mínimo (centavos). */
   shippingInCents: number;
+  /** Precio del envío por kilómetro desde el local (centavos). */
+  shippingPerKmInCents: number;
+  /** Coordenadas del local (se calculan al guardar la dirección). */
+  originLat: number | null;
+  originLng: number | null;
   minOrderInCents: number;
 }
 
@@ -23,9 +29,12 @@ export const DEFAULT_SETTINGS: BusinessSettings = {
   phoneSecondary: "(11) 3668-5271",
   address: "",
   hours: "",
-  // Envío base (flat). El costo real sube según la distancia a Bella Vista;
-  // este es el mínimo de referencia. Ajustable desde el panel de configuración.
+  // Envío: $1.200 por km desde el local, con un mínimo. Ambos se ajustan
+  // desde el panel de configuración.
   shippingInCents: 150_000,
+  shippingPerKmInCents: 120_000,
+  originLat: null,
+  originLng: null,
   minOrderInCents: 8_000_000,
 };
 

@@ -17,7 +17,11 @@ export default async function ConfiguracionPage() {
   }
 
   // Probe para detectar si la tabla existe (migración 0002).
-  const probe = await supabase.from("settings").select("id").limit(1);
+  // Incluye las columnas de envío por km (migración 0004).
+  const probe = await supabase
+    .from("settings")
+    .select("id, shipping_per_km_in_cents, origin_lat")
+    .limit(1);
   const settings = await getSettings();
 
   return (
@@ -33,9 +37,9 @@ export default async function ConfiguracionPage() {
         <div className="rounded-2xl border border-accent/30 bg-accent/10 p-6 text-sm text-accent">
           <p className="font-semibold">Falta un paso de configuración (una sola vez).</p>
           <p className="mt-2">
-            Para guardar cambios, corré la migración{" "}
-            <code>supabase/migrations/0002_categories_settings.sql</code> en el SQL Editor de
-            Supabase. Mientras tanto, la web usa los valores por defecto del código.
+            Para guardar cambios, corré en el SQL Editor de Supabase las migraciones{" "}
+            <code>0002_categories_settings.sql</code> (si no la corriste) y{" "}
+            <code>0004_gallery_shipping.sql</code> (carpeta <code>supabase/migrations</code>). Mientras tanto, la web usa los valores por defecto del código.
           </p>
           <p className="mt-2 text-xs opacity-80">Detalle técnico: {probe.error.message}</p>
         </div>

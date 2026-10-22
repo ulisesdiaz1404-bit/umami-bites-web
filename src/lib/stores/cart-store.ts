@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import type { CartItem } from "@/lib/types/cart";
 import { ADDRESS_ZONE_ID } from "@/lib/data/delivery-zones";
 
-/** Envío cotizado a partir de la dirección exacta (Nominatim). */
+/** Envío cotizado a partir de la dirección exacta o la ubicación del cliente. */
 export interface AddressQuote {
   label: string;
   priceInCents: number;
@@ -121,7 +121,7 @@ export const useCartStore = create<CartState>()(
 
       clear: () => set({ items: [] }),
       setDeliveryDate: (date) => set({ deliveryDate: date }),
-      // Elegir una localidad de la lista descarta la cotización por dirección.
+      // Cambiar de opción descarta la cotización anterior (se recalcula por dirección).
       setDeliveryZone: (zoneId) => set({ deliveryZoneId: zoneId, addressQuote: undefined }),
       // Cotización por dirección exacta: pasa a ser la zona activa.
       setAddressQuote: (quote) =>

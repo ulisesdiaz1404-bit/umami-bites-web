@@ -14,6 +14,7 @@ import {
   Users,
   UtensilsCrossed,
   Tags,
+  Images,
   Settings,
   ExternalLink,
   LogOut,
@@ -63,6 +64,7 @@ export function AdminShell({
       items: [
         { href: "/admin/menu", label: "Menú", icon: UtensilsCrossed },
         { href: "/admin/categorias", label: "Categorías", icon: Tags },
+        { href: "/admin/galeria", label: "Galería", icon: Images },
       ],
     },
     {

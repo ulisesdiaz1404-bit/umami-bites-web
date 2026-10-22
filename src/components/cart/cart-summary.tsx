@@ -32,7 +32,7 @@ export function CartSummary({ className }: { className?: string }) {
           {shippingStatus === "resolved" && deliveryZone?.km ? (
             <span className="text-[0.7rem] text-muted">({deliveryZone.label})</span>
           ) : shippingStatus === "none" ? (
-            <span className="text-[0.7rem] text-muted">(elegí la zona)</span>
+            <span className="text-[0.7rem] text-muted">(falta tu dirección)</span>
           ) : null}
         </span>
         <span className="tabular-nums">{shippingLabel}</span>

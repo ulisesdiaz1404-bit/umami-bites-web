@@ -20,24 +20,26 @@ export function useCart() {
   const totalItems = store.items.reduce((acc, i) => acc + i.quantity, 0);
   const subtotalInCents = store.items.reduce((acc, i) => acc + i.priceInCents * i.quantity, 0);
 
-  // Envío: se calcula según la zona/retiro elegido (delivery-zones.ts).
-  //  - sin zona elegida        → "none"    (mostrar "A calcular")
-  //  - zona "otra"/consultar   → "consult" (mostrar "A coordinar")
-  //  - retiro o localidad      → "resolved" (precio final, retiro = $0)
-  // Zona activa: la cotización por dirección exacta (si la hay) o la localidad
-  // elegida en la lista.
-  const zone: DeliveryZone | undefined =
-    store.deliveryZoneId === ADDRESS_ZONE_ID && store.addressQuote
-      ? {
-          id: ADDRESS_ZONE_ID,
-          label: store.addressQuote.label,
-          kind: "delivery",
-          km: store.addressQuote.km,
-          priceInCents: store.addressQuote.priceInCents,
-        }
-      : getDeliveryOption(store.deliveryZoneId);
+  // Envío: se calcula según la opción elegida (delivery-zones.ts).
+  //  - sin opción, o domicilio sin dirección calculada → "none" ("A calcular")
+  //  - "coordinar por WhatsApp"                       → "consult" ("A coordinar")
+  //  - retiro o domicilio ya cotizado                 → "resolved" (retiro = $0)
+  const quote = store.deliveryZoneId === ADDRESS_ZONE_ID ? store.addressQuote : undefined;
+  const zone: DeliveryZone | undefined = quote
+    ? {
+        id: ADDRESS_ZONE_ID,
+        label: quote.label,
+        kind: "delivery",
+        km: quote.km,
+        priceInCents: quote.priceInCents,
+      }
+    : getDeliveryOption(store.deliveryZoneId);
   const shippingStatus: "none" | "resolved" | "consult" =
-    !zone ? "none" : zone.kind === "consult" ? "consult" : "resolved";
+    !zone || (zone.id === ADDRESS_ZONE_ID && !quote)
+      ? "none"
+      : zone.kind === "consult"
+        ? "consult"
+        : "resolved";
   const shippingInCents =
     store.items.length > 0 && shippingStatus === "resolved" ? zone!.priceInCents : 0;
   const totalInCents = subtotalInCents + shippingInCents;

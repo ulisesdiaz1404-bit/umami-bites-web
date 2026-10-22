@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Banknote, CreditCard, Smartphone, MessageCircle } from "lucide-react";
+import { ArrowLeft, Banknote, CreditCard, Smartphone, MessageCircle, MapPin } from "lucide-react";
 import { track } from "@vercel/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,40 +66,95 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [quoting, setQuoting] = useState(false);
   const [quoteMsg, setQuoteMsg] = useState<string | null>(null);
+  // Última dirección cotizada: evita recalcular si no cambió.
+  const [quotedAddress, setQuotedAddress] = useState<string | null>(null);
+  const quoteSeq = useRef(0);
 
-  // Calcula el envío a partir de la dirección exacta (Nominatim, vía /api).
-  async function calcByAddress() {
-    if (!address.trim()) {
-      setQuoteMsg("Escribí tu dirección primero.");
-      return;
-    }
+  // Pide la cotización al server (Nominatim + $/km desde el local).
+  async function requestQuote(body: { address: string } | { lat: number; lng: number }) {
+    const seq = ++quoteSeq.current;
     setQuoting(true);
     setQuoteMsg(null);
     try {
       const res = await fetch("/api/shipping/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: address.trim() }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
+      // Llegó una respuesta de un pedido anterior: la descartamos.
+      if (seq !== quoteSeq.current) return null;
       if (data.ok) {
         setAddressQuote({
           label: `Envío a ${data.label}`,
           priceInCents: data.priceInCents,
           km: data.km,
         });
-      } else if (data.reason === "far") {
-        setQuoteMsg("Esa dirección queda lejos de nuestra zona. Escribinos por WhatsApp para coordinar.");
+        return data as { matched: string };
+      }
+      // Sin cotización válida: el envío vuelve a "a calcular".
+      setDeliveryZone(ADDRESS_ZONE_ID);
+      if (data.reason === "far") {
+        setQuoteMsg(
+          "Esa dirección queda lejos de nuestra zona. Elegí “Coordinar el envío por WhatsApp”."
+        );
       } else if (data.reason === "notfound") {
-        setQuoteMsg("No pudimos ubicar esa dirección. Revisala o elegí tu localidad en la lista.");
+        setQuoteMsg("No pudimos ubicar esa dirección. Revisá calle, número y localidad.");
       } else {
-        setQuoteMsg("No pudimos calcular ahora. Elegí tu localidad en la lista de arriba.");
+        setQuoteMsg("No pudimos calcular ahora. Probá de nuevo o coordinamos por WhatsApp.");
       }
     } catch {
-      setQuoteMsg("No pudimos calcular ahora. Elegí tu localidad en la lista de arriba.");
+      if (seq === quoteSeq.current) {
+        setQuoteMsg("No pudimos calcular ahora. Probá de nuevo o coordinamos por WhatsApp.");
+      }
     } finally {
-      setQuoting(false);
+      if (seq === quoteSeq.current) setQuoting(false);
     }
+    return null;
+  }
+
+  // Se dispara solo al terminar de escribir la dirección (blur / Enter).
+  function calcByAddress() {
+    const value = address.trim();
+    if (value.length < 5 || value === quotedAddress || quoting) return;
+    setQuotedAddress(value);
+    void requestQuote({ address: value });
+  }
+
+  function onAddressChange(value: string) {
+    setAddress(value);
+    // Si cambia la dirección, la cotización anterior deja de valer.
+    if (quotedAddress !== null && value.trim() !== quotedAddress) {
+      setQuotedAddress(null);
+      setDeliveryZone(ADDRESS_ZONE_ID);
+    }
+  }
+
+  // Ubicación del celular/navegador → cotización + autocompleta la dirección.
+  function calcByLocation() {
+    if (!("geolocation" in navigator)) {
+      setQuoteMsg("Tu navegador no permite compartir la ubicación. Escribí tu dirección.");
+      return;
+    }
+    setQuoting(true);
+    setQuoteMsg(null);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const data = await requestQuote({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        if (data?.matched && !address.trim()) {
+          setAddress(data.matched);
+          setQuotedAddress(data.matched);
+        }
+      },
+      () => {
+        setQuoting(false);
+        setQuoteMsg("No pudimos acceder a tu ubicación. Escribí tu dirección.");
+      },
+      { enableHighAccuracy: true, timeout: 10_000 }
+    );
   }
 
   if (hydrated && isEmpty) {
@@ -128,7 +183,11 @@ export default function CheckoutPage() {
       return;
     }
     if (shippingStatus === "none") {
-      setError("Elegí la zona de entrega o la opción de retiro.");
+      setError(
+        deliveryZoneId === ADDRESS_ZONE_ID
+          ? "Completá tu dirección para calcular el envío (o usá tu ubicación)."
+          : "Elegí cómo recibís el pedido: envío o retiro."
+      );
       return;
     }
     if (!isPickup && !address.trim()) {
@@ -270,18 +329,17 @@ export default function CheckoutPage() {
                 className="flex h-12 w-full rounded-base border border-line bg-bg-deep px-4 py-2 text-sm text-cream transition-colors focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 [color-scheme:dark]"
               >
                 <option value="" disabled>
-                  Elegí tu zona o retiro…
+                  Elegí envío o retiro…
                 </option>
                 {ALL_DELIVERY_OPTIONS.map((z) => (
                   <option key={z.id} value={z.id}>
-                    {z.kind === "delivery"
-                      ? `${z.label} — ${formatPrice(z.priceInCents, "ARS")}`
-                      : z.label}
+                    {z.label}
                   </option>
                 ))}
               </select>
               <p className="text-[0.7rem] text-muted">
-                El envío se calcula por distancia desde Bella Vista. El retiro no tiene cargo.
+                El envío cuesta {formatPrice(settings.shippingPerKmInCents, "ARS")} por km desde
+                nuestro local. El retiro no tiene cargo.
               </p>
             </div>
 
@@ -295,7 +353,14 @@ export default function CheckoutPage() {
                     placeholder="Calle, número, localidad"
                     autoComplete="street-address"
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                    onChange={(e) => onAddressChange(e.target.value)}
+                    onBlur={calcByAddress}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        calcByAddress();
+                      }
+                    }}
                   />
                 </div>
 
@@ -304,21 +369,27 @@ export default function CheckoutPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={calcByAddress}
+                    onClick={calcByLocation}
                     disabled={quoting}
                   >
-                    {quoting ? "Calculando…" : "Calcular envío por mi dirección"}
+                    <MapPin className="size-4" /> Usar mi ubicación
                   </Button>
-                  {deliveryZoneId === ADDRESS_ZONE_ID && deliveryZone && (
-                    <span className="text-xs text-accent">
-                      ✓ {deliveryZone.label} · ≈{deliveryZone.km} km ·{" "}
-                      {formatPrice(deliveryZone.priceInCents, "ARS")}
-                    </span>
+                  {quoting ? (
+                    <span className="text-xs text-muted">Calculando envío…</span>
+                  ) : (
+                    shippingStatus === "resolved" &&
+                    deliveryZoneId === ADDRESS_ZONE_ID &&
+                    deliveryZone && (
+                      <span className="text-xs text-accent">
+                        ✓ {deliveryZone.label} · ≈{deliveryZone.km} km ·{" "}
+                        {formatPrice(deliveryZone.priceInCents, "ARS")}
+                      </span>
+                    )
                   )}
                 </div>
                 {quoteMsg && <p className="text-xs text-danger">{quoteMsg}</p>}
                 <p className="text-[0.7rem] text-muted">
-                  Calculamos por tu dirección, o si preferís elegí tu localidad en la lista de arriba.
+                  El envío se calcula solo al completar tu dirección, o tocá “Usar mi ubicación”.
                 </p>
               </div>
             )}
