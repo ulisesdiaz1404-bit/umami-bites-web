@@ -57,13 +57,14 @@ export function OrdersDashboard({
     const active = orders.filter((o) => statusOf(o.status) !== "cancelado");
     const revenue = active.reduce((s, o) => s + o.total_in_cents, 0);
     // Costo de mercadería: suma del costo actual de cada ítem × cantidad.
+    // Un costo mayor al precio de venta es un dato mal cargado: no se cuenta.
     const cost = active.reduce(
       (s, o) =>
         s +
-        o.items.reduce(
-          (si, it) => si + (costMap[baseMenuItemId(it.menuItemId)] ?? 0) * it.quantity,
-          0
-        ),
+        o.items.reduce((si, it) => {
+          const c = costMap[baseMenuItemId(it.menuItemId)] ?? 0;
+          return si + (c > it.priceInCents ? 0 : c) * it.quantity;
+        }, 0),
       0
     );
     const hasCosts = Object.keys(costMap).length > 0;

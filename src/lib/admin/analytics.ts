@@ -44,8 +44,16 @@ export function pctChange(current: number, previous: number): number | null {
   return Math.round(((current - previous) / previous) * 1000) / 10;
 }
 
+/** Costo unitario de un ítem vendido. Un costo mayor al precio de venta es un
+ *  dato mal cargado (ej. el total del pedido en vez del de 1 persona): se ignora
+ *  para no dar ganancias negativas falsas; la alerta "overcost" lo señala. */
+function unitCost(it: OrderRecord["items"][number], costMap: Record<string, number>): number {
+  const c = costMap[baseId(it.menuItemId)] ?? 0;
+  return c > it.priceInCents ? 0 : c;
+}
+
 function orderCost(o: OrderRecord, costMap: Record<string, number>): number {
-  return o.items.reduce((s, it) => s + (costMap[baseId(it.menuItemId)] ?? 0) * it.quantity, 0);
+  return o.items.reduce((s, it) => s + unitCost(it, costMap) * it.quantity, 0);
 }
 
 // ---------------------------------------------------------------------
@@ -302,7 +310,7 @@ export function computeAlerts(
       id: "overcost",
       tone: "danger",
       title: `${plural(overCost.size, "producto tiene", "productos tienen")} el costo más alto que el precio`,
-      detail: `${[...overCost.values()].join(", ")}. El costo va por persona/unidad (se multiplica por la cantidad): revisalo en el menú, si no la ganancia sale negativa.`,
+      detail: `${[...overCost.values()].join(", ")}. El costo va por persona/unidad (se multiplica por la cantidad). Mientras no lo corrijas en el menú, no se cuenta en la ganancia.`,
       href: "/admin/menu",
     });
 
